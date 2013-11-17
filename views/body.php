@@ -23,9 +23,13 @@
 <div id="allcontainer" style="min-height: 100%; width:100%; padding: 0; margin: 0; border: 0px inset black !important;"
     class="ui-accordion-content ui-widget-content ui-accordion-content-active">
     <?php if(count($multiclan) > 1){ ?>
-        <div style="padding-left:26px" class="ui-accordion-content ui-widget-content ui-corner-top ui-accordion-content-active">
+        <div style="padding-left:26px; padding-right:26px" class="ui-accordion-content ui-widget-content ui-corner-top ui-accordion-content-active">
+            <table style="width: 100%;"><tbody><tr valign="center">
+            <td>
             <?php
                 foreach($multiclan as $val){
+
+                if (substr($new['data']['abbreviation'],0,1) == substr($multiclan_info[$val['id']]['data']['abbreviation'],0,1)){
                 ?>
                 <script type="text/javascript">
                     $(document).ready(function(){
@@ -53,7 +57,13 @@
                 </a>
                 <?php
                 }
+                }
             ?>
+            </td>
+            <td align="right" width="300px">
+               <img src="./images/logo_small.png" />
+            </td>
+            </tr></tbody></table>
         </div>
         <?php } ?>
     <table style="width: 100%;" cellpadding="4" cellspacing="0" class="ui-widget-content">
@@ -75,7 +85,8 @@
                         <br><?=$new['data']['name'];?>
                     </font>
                 </td>
-                <td width="300px"><img src="./images/logo_small.png" /></td>
+
+                <?php include_once(ROOT_DIR.'/views/messages.php'); ?>
                 <td width="420px"><?php if($config['lang'] == 'ru' && $config['news'] == '1'){ ?>
                         <iframe src="./news.php<?=$multi_url;?>" frameborder="0" scrolling="no" width="100%" align="middle" height="50px"></iframe>
                     <?php } ?></td>
@@ -110,6 +121,10 @@
                 <td valign="top" id="tohide2">
                     <ul id="menu" class="tabsmenu ui-corner-all">
                         <?php $i=0;
+                              $nickname = 0;
+                              if (isset($_GET['nickname']) and in_array($_GET['nickname'],array_keys($res))){ $nickname = $_GET['nickname']; ?>
+                              <li class="ui-corner-all" value="-6533"><a id="id--6533"  onclick="magic(this)" href="#tabs-player">Статистика: <?php echo $nickname; ?></a></li>
+                              <?php }
                             foreach($tabs as $key => $val){
                                 foreach(array_keys($val) as $link){
                                     if(is_numeric($key)){ ?>
@@ -124,7 +139,12 @@
                 </td>
                 <td valign="top" colspan="5">
                     <div>
-                        <?php
+                        <?php if ($nickname){
+                                  ?>
+                                  <div id="tabs-player">
+                                    <?php include_once(ROOT_DIR.'/ajax/ajax_player.php'); ?>
+                                  </div>
+                                    <?php }
                             foreach($tabs as $key => $val){
                                 foreach($val as $file){    
                                     if(is_numeric($key)){ 
@@ -166,4 +186,12 @@
             </tr>
         </tbody>
     </table>
+<center><br>
+    <a href="javascript:;" onclick="window.open('./counter/stat.php','stat','height=180,width=300').focus()" title="Статистика посещений">
+    <script language="JavaScript"><!--
+      document.write('<img src="./counter/counter2.php?rand='+Math.random()+'">');
+    //--></script></a><br>
+
+    &nbsp;<img width='88' height='31' border='0' alt='uptime' src="http://ext.host-tracker.com/uptime-img/?s=31&amp;t=12120310&amp;m=00.09&amp;p=Total&amp;src=lvuc" />
+</center>
 </div>
