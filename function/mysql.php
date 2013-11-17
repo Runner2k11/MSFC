@@ -69,6 +69,8 @@
             public function prepare($statement, $driver_options = array())
             {
                 $this->count += 1;
+                $statement = preg_replace('/`tabs`/', '`msfcmt_tabs`', $statement);
+                $statement = preg_replace('/`top_tanks`/', '`msfcmt_top_tanks`', $statement);
                 $statement = preg_replace($this->pattern, $this->replacement, $statement);
                 $statement = preg_replace('/`users`/', '`msfcmt_users`', $statement); 
                 $this->sqls[$this->count] = $statement;
@@ -77,6 +79,8 @@
             public function query($statement)
             {
                 $this->count += 1;
+                $statement = preg_replace('/`tabs`/', '`msfcmt_tabs`', $statement);
+                $statement = preg_replace('/`top_tanks`/', '`msfcmt_top_tanks`', $statement);
                 $statement = preg_replace($this->pattern, $this->replacement, $statement);
                 $statement = preg_replace('/`users`/', '`msfcmt_users`', $statement); 
                 $this->sqls[$this->count] = $statement;
@@ -91,6 +95,8 @@
             public function exec($statement)
             {
                 $this->count += 1;
+                $statement = preg_replace('/`tabs`/', '`msfcmt_tabs`', $statement);
+                $statement = preg_replace('/`top_tanks`/', '`msfcmt_top_tanks`', $statement);
                 $statement = preg_replace($this->pattern, $this->replacement, $statement);
                 $statement = preg_replace('/`users`/', '`msfcmt_users`', $statement); 
                 $this->sqls[$this->count] = $statement;
@@ -139,7 +145,7 @@
     $db->query ( 'SET character_set_connection = '.$sqlchar );
     $db->query ( 'SET character_set_client = '.$sqlchar );
     $db->query ( 'SET character_set_results = '.$sqlchar );
-    $db->query ( 'SET SESSION wait_timeout = 60;');
+    $db->query ( 'SET SESSION wait_timeout = 180;');
 
     if(isset($_GET['multi']) and preg_match("/[a-zA-Z0-9]{1,5}/i", $_GET['multi']) and (strlen($_GET['multi'])<=5)) {
 
