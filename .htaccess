@@ -21,11 +21,6 @@ RewriteRule ^tincq$ http://tinco.16mb.com/index.php?multi=tincq [R=301,L]
 RewriteRule ^/$ http://tinco.16mb.com/index.php?multi=t1nco [R=301,L]
 RewriteRule ^$ http://tinco.16mb.com/index.php?multi=t1nco [R=301,L]
 
-
-# DO NOT REMOVE THIS LINE AND THE LINES BELOW ERRORPAGEID:JyQaQu
-ErrorDocument 404 /404.html
-# DO NOT REMOVE THIS LINE AND THE LINES ABOVE JyQaQu:ERRORPAGEID
-
 php_value date.timezone Europe/Moscow
 Options All
 
