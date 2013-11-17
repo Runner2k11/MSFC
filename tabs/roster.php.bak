@@ -19,14 +19,12 @@
     <table id="roster" width="100%" cellspacing="1" class="table-id-<?=$key;?>">
         <thead>
             <tr>
-                <th><? echo ' ';?></th>
                 <th><?=$lang['name']; ?></th>
                 <th>ID</th> 
                 <th class="{sorter: 'shortDate'}"><?=$lang['in_clan']; ?></th>
                 <th><?=$lang['day_clan']; ?></th>
                 <th><?=$lang['role']; ?></th>
                 <th><?=$lang['dateof']; ?></th>
-                <th>Отсутствует</th>
             </tr>  
         </thead>
         <tbody>
@@ -63,12 +61,7 @@
                     } else { $color = 'col_black';}
                 ?>
                 <tr>
-                   <td align="center" ><a href="./main.php?nickname=<?=$val['account_name'],$multi_url_param;?>" target="_self">
-                       <div style="background-origin: content-box; padding: 0; margin: 0; " class="ui-accordion-header-icon ui-icon ui-icon-info">
-                          &nbsp;
-                        </div></a></td>
-                    <td class="<?=$color?>"><a href="<?php echo $config['base'].$val['account_name'].'/'; ?>"
-                            target="_blank"><?=$val['account_name']; ?></a></td>
+                    <td class="<?=$color?>"><a href="<?php echo $config['base'],$val['account_name'],'/'; ?>" target="_blank"><?=$val['account_name']; ?></a></td>
                     <td><?=$val['account_id']; ?></td>
                     <td><?=$date; ?></td>
                     <td><?php If (is_numeric($val['created_at'])){
@@ -80,10 +73,6 @@
                                  <span class="hidden"><?php echo $roster_local_num; ?></span>
                                  <?php echo date('Y.m.d (H:i)',$roster_local_num);
                               } else {echo $roster_local_num;}; ?></td>
-                    <td><?php
-                        $diff_time_hours = floor((time() - $roster_local_num) / 3600);
-                        printf('%02dд. %02dч.', floor($diff_time_hours/24), $diff_time_hours%24);
-                    ?></td>
                 </tr>
                 <?php } ?>
         </tbody>  

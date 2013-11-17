@@ -23,7 +23,7 @@
     }
 
     krsort($avt_eff);
-    $avt_eff = array_slice($avt_eff, 0, 5, true);
+    $avt_eff = array_slice($avt_eff, 0, 10, true);
   ?>
 
 <table cellspacing="0" cellpadding="0" width="100%" style="border-width: 0; ">
@@ -328,12 +328,11 @@ if($config['cron'] == 1 && $col_check > 2 && count($main_progress['main']) > 0){
         <table cellspacing="0" cellpadding="0" width="100%" style="border-width: 0; ">
             <tbody>
                 <tr>
-                    <td valign="top" width="30%">
+                    <td valign="top" width="35%">
                         <table cellspacing="2" cellpadding="0" width="100%" id="avt7">
                             <thead style="font-weight: bold;">
-                               <tr>
-                                 <th colspan="4" align="center"><?=$lang['loosed_today'];?></th>
-                               </tr>
+                               <tr><th align="center" colspan="4"><?=$lang['loosed_today'];?></th></tr>
+                               <tr style='display: none'><th></th><th></th><th></th><th></th></tr>
                             </thead>
                             <tbody>
                                 <?php if (count($we_loosed) > 0){
@@ -368,9 +367,9 @@ if($config['cron'] == 1 && $col_check > 2 && count($main_progress['main']) > 0){
                                             <td align="right">
                                               <?=$val['tank']; ?>
                                             </td>
-                                            <td width="130px" align="right">
+                                            <td width="70px" align="right">
                                               <?php echo '<img src="http://',$config['gm_url'],'/static/3.6.0.1/common/img/nation/',$val['nation'],'.png" />',
-                                                         '<img style="right: -50px; position: absolute;" src="',$val['link'],'" />'; ?>
+                                                         '<img style="right: -50px; position: absolute;" src="http://',$config['gm_url'],$val['link'],'" />'; ?>
                                             </td>
                                         </tr>
                                         <?php } } else { ?>
@@ -381,12 +380,11 @@ if($config['cron'] == 1 && $col_check > 2 && count($main_progress['main']) > 0){
                             </tbody>
                         </table>
                     </td>
-                    <td valign="top" width="30%">
+                    <td valign="top" width="35%">
                         <table cellspacing="2" cellpadding="0" width="100%" id="avt9">
                             <thead style="font-weight: bold;">
-                              <tr>
-                               <th colspan="4" align="center"><?=$lang['new_players'];?></th>
-                              </tr>
+                              <tr><th align="center" colspan="4"><?=$lang['new_players'];?></th></tr>
+                              <tr style='display: none'><th></th><th></th><th></th><th></th></tr>
                             </thead>
                             <tbody> 
                                 <?php if (count($new_players) > 0){

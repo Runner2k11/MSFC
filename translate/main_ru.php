@@ -384,11 +384,11 @@
     $lang['err_med1'] = 'Полученные медали принадлежат ушедшим игрокам';
     $lang['err_med2'] = 'За указанный период наград нет';
 
-    $lang['greeting_top1'] = 'Топ 5 по эффективности';
-    $lang['greeting_top2'] = 'Топ 5 по урону';
-    $lang['greeting_top3'] = 'Топ 5 по засвету';
-    $lang['greeting_top4'] = 'Топ 5 по захвату';
-    $lang['greeting_top5'] = 'Топ 5 по защите';
+    $lang['greeting_top1'] = 'Топ 10 по эффективности';
+    $lang['greeting_top2'] = 'Топ 10 по урону';
+    $lang['greeting_top3'] = 'Топ 10 по засвету';
+    $lang['greeting_top4'] = 'Топ 10 по захвату';
+    $lang['greeting_top5'] = 'Топ 10 по защите';
     $lang['greeting_h1'] = 'Общие показатели клана';
     $lang['greeting_h2'] = 'Боевые показатели клана';
     $lang['greeting_h3'] = 'Боевой опыт клана';
