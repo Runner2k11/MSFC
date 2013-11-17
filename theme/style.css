@@ -1,7 +1,7 @@
 /** Admin **/
 
 .adinsider {
-    width: 340px;
+    width: 300px;
     background-color: transparent;
     margin: 0 auto 15px auto;
     padding: 5px;
@@ -59,11 +59,9 @@
 }
 /* main */
 table.tablesorter tbody tr.dark-row td {
-  background: #444;
-  color: #ddd;
+  background: #bbb;
 }
 table.tablesorter tbody tr.dark-row a:link, table.tablesorter tbody tr.dark-row a:visited {
-  color: #ddd;
 }
 table.tablesorter tbody tr.light-row td {
   background: #ccc;
