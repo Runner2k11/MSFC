@@ -19,11 +19,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title><?=$lang['page_title']; ?></title>
+    <title><?=$lang['page_title'] . " " . $new['data']['abbreviation']; ?></title>
     <?php if (!isset($config['theme'])) {
         $config['theme'] = 'ui-lightness'; } ?>
     <link rel="stylesheet" href="./theme/<?=$config['theme']; ?>/jquery-ui.css" type="text/css" media="print, projection, screen" />
     <link rel="stylesheet" href="./theme/style.css" type="text/css" media="print, projection, screen" />
+    <?php
+    if (substr($new['data']['abbreviation'],0,4) == "DEFS"){ ?>
+            <link rel="shortcut icon" href="./favicon_defs.ico">
+    <?php } else { ?>
+            <link rel="shortcut icon" href="./favicon.ico">
+    <?php }; ?>
     <script type="text/javascript" src="./js/jquery.js"></script>
     <script type="text/javascript" src="./js/jquery.metadata.js"></script>
     <script type="text/javascript" src="./js/jquery.tablesorter.js"></script>
@@ -37,7 +43,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-              $("#roster").tablesorter({sortList:[[4,0],[3,1],[0,0]]});
+              $("#roster").tablesorter({sortList:[[5,0],[4,1],[1,0]], headers:{ 0: { sorter: false}}});
 
               $("#best_main")
               .add("#best_medal")
@@ -63,10 +69,11 @@
               $("#avt1").tablesorter({headers:{ 0: { sorter: false}, 1: {sorter: false}, 2: {sorter: false}}, widgetOptions: {uitheme : 'bootstrap'}});
               <? for ($i=2; $i<=6; $i++) {?>
               $("#avt<?=$i;?>").tablesorter({headers:{ 0: { sorter: false}, 1: {sorter: false} }, sortList:[[1,0]], widgetOptions: {uitheme : 'bootstrap'}});
-              <? }
-                 for ($i=7; $i<=9; $i++) {?>
-              $("#avt<?=$i;?>").tablesorter({headers:{ 0: { sorter: false}, 1: {sorter: false} }, sortList:[[0,0]], widgetOptions: {uitheme : 'bootstrap'}});
               <? }?>
+
+              $("#avt8").tablesorter({headers:{ 0: { sorter: false}, 1: {sorter: false} }, sortList:[[0,0]], widgetOptions: {uitheme : 'bootstrap'}});
+              $("#avt7").tablesorter({headers:{ 0: { sorter: false}, 1: {sorter: false} }, sortList:[[3,1],[0,0]], widgetOptions: {uitheme : 'bootstrap'}});
+              $("#avt9").tablesorter({headers:{ 0: { sorter: false}, 1: {sorter: false} }, sortList:[[3,1],[0,0]], widgetOptions: {uitheme : 'bootstrap'}});
 
               $( "#login_dialog" ).dialog({
                   title: "<?php echo $lang['login']; ?>",
