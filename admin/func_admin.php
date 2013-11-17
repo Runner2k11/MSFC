@@ -707,7 +707,7 @@
                       $tanks_sorted[$tank['name']]['type'] = $tank['type'];
                       $tanks_sorted[$tank['name']]['class'] = $tank['class'];
                       $tanks_sorted[$tank['name']]['nation'] = $tank['nation'];
-                      $tanks_sorted[$tank['name']]['link'] = $tank['link'];
+                      $tanks_sorted[$tank['name']]['link'] = substr($tank['link'],22);
                   }
                 }
               }
@@ -778,6 +778,11 @@
       if(count($tmp)>0) {
         foreach($tmp as $val) {
           $sql = 'DELETE FROM '.$val.' WHERE up < "'.$del.'";';
+          $q = $db->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          }
+          $sql = 'OPTIMIZE TABLE '.$val;
           $q = $db->prepare($sql);
           if ($q->execute() != TRUE) {
               die(show_message($q->errorInfo(),__line__,__file__,$sql));
