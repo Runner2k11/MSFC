@@ -70,14 +70,16 @@
 
     $myFile = ROOT_DIR."/cron.log";
     $log = 0;
+    function mydate() {
+        return date('Y-m-d H:i:s');
+    }
     $links = array();
-    $date = date('Y-m-d H:i');
     if($fh = fopen($myFile, 'a')){
         $log = 1;
-        fwrite($fh, $date."////////////////////////////////////////////--->\n");
-        fwrite($fh, $date.": (Info) Loging Started\n");
-        fwrite($fh, $date.": (Info) Authentication: ".$config['cron_auth']."\n");
-        cron_current_run($fh, $date);
+        fwrite($fh, mydate()."////////////////////////////////////////////--->\n");
+        fwrite($fh, mydate().": (Info) Loging Started\n");
+        fwrite($fh, mydate().": (Info) Authentication: ".$config['cron_auth']."\n");
+        cron_current_run($fh, mydate());
     }
 
     //cache
@@ -106,7 +108,7 @@
     if(!$dbprefix){
         $dbprefix = 'msfc_';
     }
-    if($log == 1)  fwrite($fh, $date.": (Info) Current db prefix: ".$dbprefix.", clain ID: ".$config['clan']."\n");
+    if($log == 1)  fwrite($fh, mydate().": (Info) Current db prefix: ".$dbprefix.", clain ID: ".$config['clan']."\n");
     //Authentication
     if($config['cron_auth'] == 1){
 
@@ -123,7 +125,7 @@
             $logged = 2;
         }
         if($logged != 2){
-            if($log == 1){ fwrite($fh, $date.": (Err) ".$lang['log_to_cron']."\n"); }
+            if($log == 1){ fwrite($fh, mydate().": (Err) ".$lang['log_to_cron']."\n"); }
             die($lang['log_to_cron']);
         }    
     }
@@ -134,13 +136,13 @@
             $new2 = get_api_roster($config['clan'], $config); //dg65tbhjkloinm
 
             if ($new2 === FALSE) {
-                if($log == 1)  fwrite($fh, $date.": (Err) No roster from WG!"."\n");
+                if($log == 1)  fwrite($fh, mydate().": (Err) No roster from WG!"."\n");
                 die('Some problem with downloading data from WG');
             }   else { //new2 ok
                 if ($new === FALSE) {
-                    if($log == 1)  fwrite($fh, $date.": (WG) First load of roster from WG."."\n");
+                    if($log == 1)  fwrite($fh, mydate().": (WG) First load of roster from WG."."\n");
                 }   else {
-                    if($log == 1)  fwrite($fh, $date.": (WG) Successfully loaded roster from WG."."\n");
+                    if($log == 1)  fwrite($fh, mydate().": (WG) Successfully loaded roster from WG."."\n");
                 }
                 if (empty($new2)){
                     $new2['status'] = 'error';
@@ -162,44 +164,57 @@
                             $links = cron_links($roster,$config);
                             $count = count($links); 
                             if ($count > 0){
-                                if($log == 1) fwrite($fh, $date.": (WG) Try to load info on ".$count." players"."\n");
+                                if($log == 1) fwrite($fh, mydate().": (WG) Try to load info on ".$count." players"."\n");
                                 unset($count);
                                 multiget($links, $res,$config,prepare_stat(),$roster,$lang,1);    
                             }
                             $pcount = 1;
                             foreach($res as $name => $val){
-                              cron_insert_pars_data($val,$roster[$name],$config,$now,$log,$fh,$date,$pcount);
+                              cron_insert_pars_data($val,$roster[$name],$config,$now,$log,$fh,mydate(),$pcount);
                               ++$pcount;
                             }
                             update_multi_cron($dbprefix);
-                            if($log == 1) fwrite($fh, $date.": (Info) ".$lang['cron_done']."\n");
+                            if($log == 1) fwrite($fh, mydate().": (Info) ".$lang['cron_done']."\n");
                             echo $lang['cron_done'];
                         }   else {//count($new2['data']['members'] <=0
-                            if($log == 1)  fwrite($fh, $date.": (Err) Members count is zero."."\n");
+                            if($log == 1)  fwrite($fh, mydate().": (Err) Members count is zero."."\n");
                         }
                     }   else {// data from WG is older than in cache
-                        if($log == 1)  fwrite($fh, $date.": (Err) Get old data from WG."."\n");
+                        if($log == 1)  fwrite($fh, mydate().": (Err) Get old data from WG."."\n");
                     }
                 }   else { //new2['status'] <> 'ok'
-                    if($log == 1) fwrite($fh, $date.": (Err) General problem. Unusual roster from WG."."\n");
+                    if($log == 1) fwrite($fh, mydate().": (Err) General problem. Unusual roster from WG."."\n");
                 }
             } //new2ok
         }   else { // ($config['cron'] <> 1
-            if($log == 1) fwrite($fh, $date.": (Err) ".$lang['error_cron_off']."\n");
+            if($log == 1) fwrite($fh, mydate().": (Err) ".$lang['error_cron_off']."\n");
             echo $lang['error_cron_off'];
         }
     }   else { // $config['cron_time']*3600) > now
-        if($log == 1) fwrite($fh, $date.": (Err) Cron started too early. Time limit excided"."\n");
+        if($log == 1) fwrite($fh, mydate().": (Err) Cron started too early. Time limit excided"."\n");
         echo 'Cron started too early!';
     }
     //write some data for debug
     if ($log == 1){
         $end_time = microtime(true);
-        fwrite($fh, $date.": (Info) ".count($links)." players processed in ".(round($end_time - $begin_time,4).' '.$lang['sec'])."\n");
+        fwrite($fh, mydate().": (Info) ".count($links)." players processed in ".(round($end_time - $begin_time,4).' '.$lang['sec'])."\n");
         if(is_numeric($db->count)) {
-            fwrite($fh, $date.": (Info) Number of MySQL queries - ".($db->count)."\n");
+            fwrite($fh, mydate().": (Info) Number of MySQL queries - ".($db->count)."\n");
         }
-        fwrite($fh, $date.": (Info) End cron job\n");
+        fwrite($fh, mydate().": (Info) End cron job\n");
     }
     //print_r($lang);
+  
+    //Delete old data in the database
+    include_once(ROOT_DIR.'/admin/func_admin.php');
+    $olderdate=50;
+    if($log == 1){
+        fwrite($fh, mydate().": Delete data over ".$olderdate." days in the database\n");
+    }
+    clean_db_old_cron($olderdate);
+    if($log == 1){
+        fwrite($fh, mydate().": End delete\n");
+        fwrite($fh, mydate()."////////////////////////////////////////////--->\n\n");
+    }
+
 ?>
