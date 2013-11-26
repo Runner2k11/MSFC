@@ -11,7 +11,7 @@
     * @copyright   2011-2012 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 2.2.0 $
+    * @version     $Rev: 3.0.0 $
     *
     */
 ?>
@@ -65,8 +65,8 @@
     </select>
     <select id="lvl">
         <option value="all"><?=$lang['alltanks_all']?></option>
-        <?php foreach($tanks_lvl as $val){?>
-            <option value="<?=$val['lvl']?>" <?php if ($val['lvl']=='1') {echo 'selected="selected"';}; ?>><?=$val['lvl']?></option>
+        <?php foreach($tanks_lvl as $key => $val){?>
+            <option value="<?=$val['level']?>" <?php if ($val['level']=='1') {echo 'selected="selected"';}; ?>><?=$val['level']?></option>
             <?php } ?>
     </select>
     <a href="#tabs-<?php echo $key; ?>" id="change_button_tanks"><?=$lang['select_show'];?></a>
