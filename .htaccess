@@ -1,29 +1,21 @@
 RewriteEngine on
-RewriteCond %{HTTP_HOST} ^tinco.16mb.com$ [OR]
-RewriteCond %{HTTP_HOST} ^www.tinco.16mb.com$
-RewriteRule ^defs/$ http://tinco.16mb.com/index.php?multi=defs [R=301,L]
-RewriteRule ^defs$ http://tinco.16mb.com/index.php?multi=defs [R=301,L]
-RewriteRule ^defs2/$ http://tinco.16mb.com/index.php?multi=defs2 [R=301,L]
-RewriteRule ^defs2$ http://tinco.16mb.com/index.php?multi=defs2 [R=301,L]
-RewriteRule ^tinco/$ http://tinco.16mb.com/index.php?multi=tinco [R=301,L]
-RewriteRule ^tinco$ http://tinco.16mb.com/index.php?multi=tinco [R=301,L]
-RewriteRule ^tinc0/$ http://tinco.16mb.com/index.php?multi=tinc0 [R=301,L]
-RewriteRule ^tinc0$ http://tinco.16mb.com/index.php?multi=tinc0 [R=301,L]
-RewriteRule ^t1nco/$ http://tinco.16mb.com/index.php?multi=t1nco [R=301,L]
-RewriteRule ^t1nco$ http://tinco.16mb.com/index.php?multi=t1nco [R=301,L]
-RewriteRule ^t1nc0/$ http://tinco.16mb.com/index.php?multi=t1nc0 [R=301,L]
-RewriteRule ^t1nc0$ http://tinco.16mb.com/index.php?multi=t1nc0 [R=301,L]
-RewriteRule ^t1ncq/$ http://tinco.16mb.com/index.php?multi=t1ncq [R=301,L]
-RewriteRule ^t1ncq$ http://tinco.16mb.com/index.php?multi=t1ncq [R=301,L]
-RewriteRule ^tincq/$ http://tinco.16mb.com/index.php?multi=tincq [R=301,L]
-RewriteRule ^tincq$ http://tinco.16mb.com/index.php?multi=tincq [R=301,L]
 
-RewriteRule ^/$ http://tinco.16mb.com/index.php?multi=t1nco [R=301,L]
-RewriteRule ^$ http://tinco.16mb.com/index.php?multi=t1nco [R=301,L]
+#Set default T1NCO
+#RewriteRule ^$ /t1nco
+
+RewriteRule ^admin/? - [L]
+RewriteRule ^ppp/? - [L]
+
+RewriteRule ^(\w+).html$ /main.php?multi=$1 [L]
+RewriteRule ^(\w+)/$ /$1 [R=301]
+RewriteRule ^(\w+)$ /index.php?multi=$1 [L]
 
 php_value date.timezone Europe/Moscow
-Options All
 
-# AddDefaultCharset utf-8
+#AddDefaultCharset utf-8
 Options -Indexes
 DirectoryIndex index.php main.php
+Options All
+
+#RewriteRule ^\w+$ /offline.php [L]
+#DirectoryIndex offline.php
