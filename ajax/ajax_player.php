@@ -15,8 +15,8 @@
     *
     */
 
-?>
-<?php
+
+
     error_reporting(E_ALL & ~E_STRICT);
     ini_set("display_errors", 1);
     if (!defined('ROOT_DIR')) {
@@ -285,7 +285,7 @@ foreach ($statacc as $val) {
              <td align="center"><?=$eff_ratpl[$nickname]['brone']; ?></td>
            </tr>
            <tr>
-             <td align="center" colspan="2"><?php echo '<img src="/images/brone/'.$imgg.'" />'; ?></td>
+             <td align="center" colspan="2"><?php echo '<img src="./images/brone/'.$imgg.'" />'; ?></td>
            </tr>
            <tr>
              <td align="center" colspan="2"><?=$textt; ?></td>
