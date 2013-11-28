@@ -28,8 +28,7 @@
             <td>
             <?php
                 foreach($multiclan as $val){
-
-                if (substr($new['data']['abbreviation'],0,1) == substr($multiclan_info[$val['id']]['data']['abbreviation'],0,1)){
+                if (substr($multiclan_info[$config['clan']]['data'][$config['clan']]['abbreviation'],0,1) == substr($multiclan_info[$val['id']]['data'][$val['id']]['abbreviation'],0,1)){
                 ?>
                 <script type="text/javascript">
                     $(document).ready(function(){
