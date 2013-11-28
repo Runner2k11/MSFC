@@ -28,34 +28,35 @@
             <td>
             <?php
                 foreach($multiclan as $val){
-	                if (substr($multiclan_info[$config['clan']]['data'][$config['clan']]['abbreviation'],0,1) == substr($multiclan_info[$val['id']]['data'][$val['id']]['abbreviation'],0,1)){
-                                ?>
-		                <script type="text/javascript">
-		                    $(document).ready(function(){
-		                        $("#pane").hover(function() {
-		                            $("#pane").addClass('ui-state-focus');
-		                            }, function() {
-		                                $("#pane").removeClass('ui-state-focus');
-		                        });
-		                        $("#<?=$val['prefix'].'1';?>").button();
-		                        <?php if(isset($_GET['multi'])){ ?>
-		                            $("#<?=$_GET['multi'].'_1'?>").addClass('ui-state-focus');
-		                            <?php }else{ ?>
-		                            $("#<?=$multiclan_main['prefix'].'1'?>").addClass('ui-state-focus');
-		                            <?php } ?>
-		                    });
-		                </script>
-		                <?php
-		                    $multi_get = '';
-		                    if($val['main'] != 1){
-		                        $multi_get = '?multi='.str_replace('_','',$val['prefix']);
-		                    }
-		                ?>                                                             
-		                <a style="margin: 0 5px;" id="<?=$val['prefix'].'1';?>" href="./index.php<?=$multi_get?>">
-		                    <img height="24" border="0" src="<?=$multiclan_info[$val['id']]['data'][$val['id']]['emblems']['small'];?>" /><span style="margin: auto 4px; display:block; color:<?=$multiclan_info[$val['id']]['data'][$val['id']]['clan_color']?>"><?=$multiclan_info[$val['id']]['data'][$val['id']]['abbreviation']?></span>
-		                </a>
-		                <?php
-	                }
+
+                if (substr($new['data']['abbreviation'],0,1) == substr($multiclan_info[$val['id']]['data']['abbreviation'],0,1)){
+                ?>
+                <script type="text/javascript">
+                    $(document).ready(function(){
+                        $("#pane").hover(function() {
+                            $("#pane").addClass('ui-state-focus');
+                            }, function() {
+                                $("#pane").removeClass('ui-state-focus');
+                        });
+                        $("#<?=$val['prefix'].'1';?>").button();
+                        <?php if(isset($_GET['multi'])){ ?>
+                            $("#<?=$_GET['multi'].'_1'?>").addClass('ui-state-focus');
+                            <?php }else{ ?>
+                            $("#<?=$multiclan_main['prefix'].'1'?>").addClass('ui-state-focus');
+                            <?php } ?>
+                    });
+                </script>
+                <?php
+                    $multi_get = '';
+                    if($val['main'] != 1){
+                        $multi_get = '?multi='.str_replace('_','',$val['prefix']);
+                    }
+                ?>                                                             
+                <a style="margin: 0 5px;" id="<?=$val['prefix'].'1';?>" href="./index.php<?=$multi_get?>">
+                    <img height="24" border="0" src="<?=$multiclan_info[$val['id']]['data'][$val['id']]['emblems']['small'];?>" /><span style="margin: auto 4px; display:block; color:<?=$multiclan_info[$val['id']]['data'][$val['id']]['clan_color']?>"><?=$multiclan_info[$val['id']]['data'][$val['id']]['abbreviation']?></span>
+                </a>
+                <?php
+                }
                 }
             ?>
             </td>
