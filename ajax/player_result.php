@@ -8,10 +8,10 @@
     * Date:        $Date: 2012-12-01
     * -----------------------------------------------------------------------
     * @author      $Author: SHW $
-    * @copyright   2012-2012 SHW
+    * @copyright   2012-2013 SHW
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 2.2.0 $
+    * @version     $Rev: 3.0.0 $
     *
     */
 ?>
@@ -82,53 +82,17 @@
    });
 </script>
 
-<style>
-.a_num {
-    position:absolute; 
-    bottom:1px; 
-    padding:0px 3px; 
-    text-align:center; 
-    right:1px; 
-    min-width:18px; 
-    color: black; 
-    border:1px solid black;
-    font-size:10px;
-}
-.medalDiv {
-    text-align:center;
-    width:70px; 
-    height:75px; 
-    *display:inline; 
-    *float:left;
-    display:inline-block; 
-    margin:5px; 
-    position:relative;
-}
-.faded {
-    opacity:0.4;
-    filter: alpha(opacity=40);
-}
-</style>
-
-<?   $not_incl = array ('account_id', 'name', 'role', 'server', 'reg', 'local', 'member_since');
+<?   $not_incl = array ('account_id', 'nickname', 'created_at');
      $darkgreen = '<span style="color:DarkGreen;"><img style="vertical-align: -5%;" width="11" height="11" src="./images/up.png">&nbsp;';
      $darkred = '<span style="color:DarkRed;"><img style="vertical-align: -5%;" width="11" height="11" src="./images/down.png">&nbsp;';
      $darkend = '</span>';
      $b_info_nation = $b_info_type = $b_info_lvl = $b_diff_played = $b_played_tanks = $effect = $b_pl_mp = $diff = $last = array();
+     $mark_of_mastrery = $mark_of_mastrery_d = array_fill(0, 5, 0);
      global $db;
      $b_nation = tanks_nations();
-
-     $sql = "SELECT * FROM `tanks` ORDER BY id ASC;";
-     $q = $db->prepare($sql);
-     if ($q->execute() == TRUE) {
-        $b_tank_name_tmp = $q->fetchAll(PDO::FETCH_ASSOC);
-     }  else {
-        die(show_message($q->errorInfo(),__line__,__file__,$sql));
-     };
-     foreach($b_tank_name_tmp as $tmp) {
-        $b_tank_name[$tmp['id']] = $tmp;
-     };
-     unset($b_tank_name_tmp);
+     $medn = medn($b_nation);
+     $b_tank_name = tanks();
+     $marks = marks();
 
     if (isset($_POST['b_from']) ) {
         $b_from = $_POST['b_from'];
@@ -152,32 +116,24 @@ If (($b_from<>'') && ($b_to<>'') ) {
     $b_to1 = explode('.',$b_to);
     $b_to11 = mktime(23, 59, 59, $b_to1['1'], $b_to1['0'], $b_to1['2']);
     $resall = $cache->get('get_last_roster_'.$config['clan'],0);
-    foreach($resall['data']['members'] as $id1 => $val ) {
+    foreach($resall['data'][$config['clan']]['members'] as $id1 => $val ) {
        if ($val['account_name']==$b_player) {
            $b_res = $val;
        }
      };
      if (empty($b_res)) {die('No cached data');};
-     $sql = "SELECT * FROM `col_tank_".$b_nation[0]['nation']."` WHERE account_id = '".$b_res['account_id']."' AND up < '".$b_to11."' AND up >= '".$b_from11."' ORDER BY up DESC;";
-          $q = $db->prepare($sql);
-          if ($q->execute() == TRUE) {
-              $b_tanks = $q->fetchAll();
-          }   else {
-              die(show_message($q->errorInfo(),__line__,__file__,$sql));
-          };
-     $sql = "SELECT * FROM `col_players` WHERE account_id = '".$b_res['account_id']."' AND up < '".$b_to11."' AND up >= '".$b_from11."' ORDER BY up DESC;";
+     $sql = "SELECT * FROM `col_players` WHERE account_id = '".$b_res['account_id']."' AND updated_at < '".$b_to11."' AND updated_at >= '".$b_from11."' ORDER BY updated_at DESC;";
           $q = $db->prepare($sql);
           if ($q->execute() == TRUE) {
               $b_player_all = $q->fetchAll();
           }   else {
               die(show_message($q->errorInfo(),__line__,__file__,$sql));
           };
-
 if (count($b_player_all) >1) {
 
 //new tanks
      foreach ($b_nation as $val) {
-        $sql = "SELECT * FROM `col_tank_".$val['nation']."` WHERE account_id = '".$b_res['account_id']."' AND up < '".$b_to11."' AND up >= '".$b_from11."' ORDER BY up DESC;";
+        $sql = "SELECT * FROM `col_tank_".$val['nation']."` WHERE account_id = '".$b_res['account_id']."' AND updated_at < '".$b_to11."' AND updated_at >= '".$b_from11."' ORDER BY updated_at DESC;";
                 $q = $db->prepare($sql);
                 if ($q->execute() == TRUE) {
                     $tanks = $q->fetchAll();
@@ -188,47 +144,51 @@ if (count($b_player_all) >1) {
         foreach ($b_tank_name as $id => $val3) {
                  if (!isset ($b_diff_played['nation'][$b_tank_name[$id]['nation']]['win']))    $b_diff_played['nation'][$b_tank_name[$id]['nation']]['win'] = 0;
                  if (!isset ($b_diff_played['nation'][$b_tank_name[$id]['nation']]['total']))  $b_diff_played['nation'][$b_tank_name[$id]['nation']]['total'] = 0;
-                 if (!isset ($b_diff_played['lvl'][$b_tank_name[$id]['lvl']]['win']))          $b_diff_played['lvl'][$b_tank_name[$id]['lvl']]['win'] = 0;
-                 if (!isset ($b_diff_played['lvl'][$b_tank_name[$id]['lvl']]['total']))        $b_diff_played['lvl'][$b_tank_name[$id]['lvl']]['total'] = 0;
+                 if (!isset ($b_diff_played['level'][$b_tank_name[$id]['level']]['win']))      $b_diff_played['level'][$b_tank_name[$id]['level']]['win'] = 0;
+                 if (!isset ($b_diff_played['level'][$b_tank_name[$id]['level']]['total']))    $b_diff_played['level'][$b_tank_name[$id]['level']]['total'] = 0;
                  if (!isset ($b_diff_played['type'][$b_tank_name[$id]['type']]['win']))        $b_diff_played['type'][$b_tank_name[$id]['type']]['win'] = 0;
                  if (!isset ($b_diff_played['type'][$b_tank_name[$id]['type']]['total']))      $b_diff_played['type'][$b_tank_name[$id]['type']]['total'] = 0;
 
                  if (!isset ($b_info['nation'][$b_tank_name[$id]['nation']]['win']))           $b_info['nation'][$b_tank_name[$id]['nation']]['win'] = 0;
                  if (!isset ($b_info['nation'][$b_tank_name[$id]['nation']]['total']))         $b_info['nation'][$b_tank_name[$id]['nation']]['total'] = 0;
-                 if (!isset ($b_info['lvl'][$b_tank_name[$id]['lvl']]['win']))                 $b_info['lvl'][$b_tank_name[$id]['lvl']]['win'] = 0;
-                 if (!isset ($b_info['lvl'][$b_tank_name[$id]['lvl']]['total']))               $b_info['lvl'][$b_tank_name[$id]['lvl']]['total'] = 0;
+                 if (!isset ($b_info['level'][$b_tank_name[$id]['level']]['win']))             $b_info['level'][$b_tank_name[$id]['level']]['win'] = 0;
+                 if (!isset ($b_info['level'][$b_tank_name[$id]['level']]['total']))           $b_info['level'][$b_tank_name[$id]['level']]['total'] = 0;
                  if (!isset ($b_info['type'][$b_tank_name[$id]['type']]['win']))               $b_info['type'][$b_tank_name[$id]['type']]['win'] = 0;
                  if (!isset ($b_info['type'][$b_tank_name[$id]['type']]['total']))             $b_info['type'][$b_tank_name[$id]['type']]['total'] = 0;
 
-           If (isset($tanks[0][$id.'_t'])) {
-
-              if (($tanks[count($tanks)-1][$id.'_t'] == '0')&&($tanks[0][$id.'_t'] > 0)) $b_new_tank[$id] = $b_tank_name[$id];
-              if ($tanks[count($tanks)-1][$id.'_t'] <> $tanks[0][$id.'_t'] and $tanks[0][$id.'_t']>0) {
-                 $b_played_tanks[$id]['tank'] =  $b_tank_name[$id]['tank'];
+          If (isset($tanks[0][$id.'_battles'])) {
+              if (isset($tanks[0][$id.'_mark_of_mastery'])){$mark_of_mastrery[$tanks[0][$id.'_mark_of_mastery']] ++;}
+              if (isset($tanks[count($tanks)-1][$id.'_mark_of_mastery'])){$mark_of_mastrery_d[$tanks[count($tanks)-1][$id.'_mark_of_mastery']] ++;}
+              if (($tanks[count($tanks)-1][$id.'_battles'] == '0')&&($tanks[0][$id.'_battles'] > 0)) $b_new_tank[$id] = $b_tank_name[$id];
+              if ($tanks[count($tanks)-1][$id.'_battles'] <> $tanks[0][$id.'_battles']) {
+                 $b_played_tanks[$id]['tank'] =  $b_tank_name[$id]['name_i18n'];
                  $b_played_tanks[$id]['nation'] = $val['nation'];
-                 $b_played_tanks[$id]['total'] = $tanks[0][$id.'_t'];
-                 $b_played_tanks[$id]['win'] = $tanks[0][$id.'_w'];
-                 $b_played_tanks[$id]['total_d'] = $tanks[0][$id.'_t']-$tanks[count($tanks)-1][$id.'_t'];
-                 $b_played_tanks[$id]['win_d'] = $tanks[0][$id.'_w']-$tanks[count($tanks)-1][$id.'_w'];
+                 $b_played_tanks[$id]['total'] = $tanks[0][$id.'_battles'];
+                 $b_played_tanks[$id]['mark_of_mastery'] = $tanks[0][$id.'_mark_of_mastery'];
+                 $b_played_tanks[$id]['win'] = $tanks[0][$id.'_wins'];
+                 $b_played_tanks[$id]['total_d'] = $tanks[0][$id.'_battles']-$tanks[count($tanks)-1][$id.'_battles'];
+                 $b_played_tanks[$id]['win_d'] = $tanks[0][$id.'_wins']-$tanks[count($tanks)-1][$id.'_wins'];
+                 $b_played_tanks[$id]['mark_of_mastery_d'] = $tanks[count($tanks)-1][$id.'_mark_of_mastery'];
 
-                 $b_diff_played['nation'][$b_tank_name[$id]['nation']]['total'] += ($tanks[0][$id.'_t']- $tanks[count($tanks)-1][$id.'_t']);
-                 $b_diff_played['nation'][$b_tank_name[$id]['nation']]['win'] +=   ($tanks[0][$id.'_w']- $tanks[count($tanks)-1][$id.'_w']);
-                 $b_diff_played['lvl'][$b_tank_name[$id]['lvl']]['total'] +=       ($tanks[0][$id.'_t']- $tanks[count($tanks)-1][$id.'_t']);
-                 $b_diff_played['lvl'][$b_tank_name[$id]['lvl']]['win'] +=         ($tanks[0][$id.'_w']- $tanks[count($tanks)-1][$id.'_w']);
-                 $b_diff_played['type'][$b_tank_name[$id]['type']]['total'] +=     ($tanks[0][$id.'_t']- $tanks[count($tanks)-1][$id.'_t']);
-                 $b_diff_played['type'][$b_tank_name[$id]['type']]['win'] +=       ($tanks[0][$id.'_w']- $tanks[count($tanks)-1][$id.'_w']);
+                 $b_diff_played['nation'][$b_tank_name[$id]['nation']]['total'] += ($tanks[0][$id.'_battles']- $tanks[count($tanks)-1][$id.'_battles']);
+                 $b_diff_played['nation'][$b_tank_name[$id]['nation']]['win'] +=   ($tanks[0][$id.'_wins']- $tanks[count($tanks)-1][$id.'_wins']);
+                 $b_diff_played['level'][$b_tank_name[$id]['level']]['total'] +=   ($tanks[0][$id.'_battles']- $tanks[count($tanks)-1][$id.'_battles']);
+                 $b_diff_played['level'][$b_tank_name[$id]['level']]['win'] +=     ($tanks[0][$id.'_wins']- $tanks[count($tanks)-1][$id.'_wins']);
+                 $b_diff_played['type'][$b_tank_name[$id]['type']]['total'] +=     ($tanks[0][$id.'_battles']- $tanks[count($tanks)-1][$id.'_battles']);
+                 $b_diff_played['type'][$b_tank_name[$id]['type']]['win'] +=       ($tanks[0][$id.'_wins']- $tanks[count($tanks)-1][$id.'_wins']);
                  }
-              if ($tanks[0][$id.'_t'] <> '0') {
-                 $b_info['nation'][$b_tank_name[$id]['nation']]['win'] += $tanks[0][$id.'_w'];
-                 $b_info['nation'][$b_tank_name[$id]['nation']]['total'] += $tanks[0][$id.'_t'];
-                 $b_info['lvl'][$b_tank_name[$id]['lvl']]['win'] += $tanks[0][$id.'_w'];
-                 $b_info['lvl'][$b_tank_name[$id]['lvl']]['total'] += $tanks[0][$id.'_t'];
-                 $b_info['type'][$b_tank_name[$id]['type']]['win'] += $tanks[0][$id.'_w'];
-                 $b_info['type'][$b_tank_name[$id]['type']]['total'] += $tanks[0][$id.'_t'];
+              if ($tanks[0][$id.'_battles'] <> '0') {
+                 $b_info['nation'][$b_tank_name[$id]['nation']]['win'] += $tanks[0][$id.'_wins'];
+                 $b_info['nation'][$b_tank_name[$id]['nation']]['total'] += $tanks[0][$id.'_battles'];
+                 $b_info['level'][$b_tank_name[$id]['level']]['win'] += $tanks[0][$id.'_wins'];
+                 $b_info['level'][$b_tank_name[$id]['level']]['total'] += $tanks[0][$id.'_battles'];
+                 $b_info['type'][$b_tank_name[$id]['type']]['win'] += $tanks[0][$id.'_wins'];
+                 $b_info['type'][$b_tank_name[$id]['type']]['total'] += $tanks[0][$id.'_battles'];
               }
            }
         }
      };
+
 
 
 //main_data w/o tanks
@@ -239,36 +199,37 @@ if (count($b_player_all) >1) {
               $first[$key] = $b_player_all[count($b_player_all)-1][$key];
         }
      };
-     $first['dead_heat'] = $first['total']-$first['lose']-$first['win'] ;
-     $last['dead_heat'] = $last['total']-$last['lose']-$last['win'] ;
+     $first['dead_heat'] = $first['all_draws'];
+     $last['dead_heat'] = $last['all_draws'];
      $diff['dead_heat'] = $first['dead_heat'] - $last['dead_heat'];
 //efficient
-     If ($last['total'] == 0)  {$last['total'] = 1/100000;}
-     If ($first['total'] == 0) {$first['total'] = 1/100000;}
-     $effect['des'] = $last['des'] / $last['total'];
-     $effect['dmg'] = $last['dmg'] / $last['total'];
-     $effect['spot'] = $last['spot'] / $last['total'];
-     $effect['def'] = $last['def'] / $last['total'];
-     $effect['cap'] = $last['cap'] / $last['total'];
-     $effect['lvl'] = 0;
-     foreach ($b_info['lvl'] as $lvl_key => $val)
-        $effect['lvl'] += $lvl_key*$val['total']/$last['total'];
-     $effect['lvl'] = number_format($effect['lvl'], 2, '.', '');
-     $eff_rating  = number_format($effect['dmg']*(10/($effect['lvl'] +2 ))*(0.23+2*$effect['lvl']/100) + $effect['des']*0.25*1000 + $effect['spot']*0.15*1000 + log($effect['cap']+1,1.732)*0.15*1000 + $effect['def']*0.15*1000,2, '.', '');
-     $effect['des2'] = ($first['des'])  / ($first['total']);
-     $effect['dmg2'] = ($first['dmg'])  / ($first['total']);
-     $effect['spot2'] = ($first['spot']) / ($first['total']);
-     $effect['def2'] = ($first['def'])  / ($first['total']);
-     $effect['cap2'] = ($first['cap'])  / ($first['total']);
-     $effect['lvl2'] = 0;
-     foreach ($b_info['lvl'] as $lvl_key => $val)
-        $effect['lvl2'] += $lvl_key*$val['total']/($first['total']);
-     $effect['lvl2'] = number_format($effect['lvl'], 2, '.', '');
-     $eff_rating_ = number_format($effect['dmg2']*(10/($effect['lvl2'] +2 ))*(0.23+2*$effect['lvl2']/100) + $effect['des2']*0.25*1000 + $effect['spot2']*0.15*1000 + log($effect['cap2']+1,1.732)*0.15*1000 + $effect['def2']*0.15*1000,2, '.', '');
+     If ($last['all_battles'] == 0)  {$last['all_battles'] = 1/100000;}
+     If ($first['all_battles'] == 0) {$first['all_battles'] = 1/100000;}
+     $effect['all_frags'] = $last['all_frags'] / $last['all_battles'];
+     $effect['all_damage_dealt'] = $last['all_damage_dealt'] / $last['all_battles'];
+     $effect['all_spotted'] = $last['all_spotted'] / $last['all_battles'];
+     $effect['all_dropped_capture_points'] = $last['all_dropped_capture_points'] / $last['all_battles'];
+     $effect['all_capture_points'] = $last['all_capture_points'] / $last['all_battles'];
+     $effect['level'] = 0;
+
+     foreach ($b_info['level'] as $lvl_key => $val)
+        $effect['level'] += $lvl_key*$val['total']/$last['all_battles'];
+     $effect['level'] = number_format($effect['level'], 2, '.', '');
+     $eff_rating  = number_format($effect['all_damage_dealt']*(10/($effect['level'] +2 ))*(0.23+2*$effect['level']/100) + $effect['all_frags']*0.25*1000 + $effect['all_spotted']*0.15*1000 + log($effect['all_capture_points']+1,1.732)*0.15*1000 + $effect['all_dropped_capture_points']*0.15*1000,2, '.', '');
+     $effect['des2'] = ($first['all_frags'])  / ($first['all_battles']);
+     $effect['dmg2'] = ($first['all_damage_dealt'])  / ($first['all_battles']);
+     $effect['spot2'] = ($first['all_spotted']) / ($first['all_battles']);
+     $effect['def2'] = ($first['all_dropped_capture_points'])  / ($first['all_battles']);
+     $effect['cap2'] = ($first['all_capture_points'])  / ($first['all_battles']);
+     $effect['level2'] = 0;
+     foreach ($b_info['level'] as $lvl_key => $val)
+        $effect['level2'] += $lvl_key*$val['total']/($first['all_battles']);
+     $effect['level2'] = number_format($effect['level'], 2, '.', '');
+     $eff_rating_ = number_format($effect['dmg2']*(10/($effect['level2'] +2 ))*(0.23+2*$effect['level2']/100) + $effect['des2']*0.25*1000 + $effect['spot2']*0.15*1000 + log($effect['cap2']+1,1.732)*0.15*1000 + $effect['def2']*0.15*1000,2, '.', '');
      $eff_rating2 = number_format($eff_rating - $eff_rating_, 2, '.', '');
-     $eff_ratingb = round((log($last['total'])/10)*(($last['averag_exp']*1)+($effect['dmg']*(($last['win']/$last['total'])*2+$effect['des']*0.9+$effect['spot']*0.5+$effect['def']*0.5+$effect['cap']*0.5))),0);
-     $eff_ratingb_ = round((log($first['total'])/10)*((($first['averag_exp'])*1)+($effect['dmg2']*((($first['win'])/($first['total']))*2+$effect['des2']*0.9+$effect['spot2']*0.5+$effect['def2']*0.5+$effect['cap2']*0.5))),0);
-     $eff_ratingb2 = $eff_ratingb- $eff_ratingb_;
+     $eff_ratingb = round((log($last['all_battles'])/10)*(($last['all_battle_avg_xp']*1)+($effect['all_damage_dealt']*(($last['all_wins']/$last['all_battles'])*2+$effect['all_frags']*0.9+$effect['all_spotted']*0.5+$effect['all_dropped_capture_points']*0.5+$effect['all_capture_points']*0.5))),0);
+     $eff_ratingb_ = round((log($first['all_battles'])/10)*((($first['all_battle_avg_xp'])*1)+($effect['dmg2']*((($first['all_wins'])/($first['all_battles']))*2+$effect['des2']*0.9+$effect['spot2']*0.5+$effect['def2']*0.5+$effect['cap2']*0.5))),0);
+     $eff_ratingb2 = $eff_ratingb - $eff_ratingb_;
 
      switch ($eff_rating) {
         case ($eff_rating < 600):
@@ -293,40 +254,41 @@ if (count($b_player_all) >1) {
 
      switch ($eff_ratingb+1) {
         case ($eff_ratingb > 7294):
-           $textt = 'Виртуоз<br>(рейтинг выше, чем у 99% игроков)';$imgg='http://armor.kiev.ua/wot/images/classVf.png';
+           $textt = $lang['classVf'];$imgg='classVf.png';
            break;
         case ($eff_ratingb > 5571):
-           $textt = 'Мастер-танкист<br>(рейтинг выше, чем у 95% игроков)';$imgg='http://armor.kiev.ua/wot/images/classMf.png';
+           $textt = $lang['classMf'];$imgg='classMf.png';
            break;
         case ($eff_ratingb > 3851):
-           $textt = 'Танкист 1-го класса<br>(рейтинг выше, чем у 80% игроков)';$imgg='http://armor.kiev.ua/wot/images/class1f.png';
+           $textt = $lang['class1f'];$imgg='class1f.png';
            break;
         case ($eff_ratingb > 2736):
-           $textt = 'Танкист 2-го класса<br>(рейтинг выше, чем у 60% игроков)';$imgg='http://armor.kiev.ua/wot/images/class2f.png';
+           $textt = $lang['class2f'];$imgg='class2f.png';
            break;
         case ($eff_ratingb > 2084):
-           $textt = 'Танкист 3-го класса<br>(рейтинг выше, чем у 45% игроков)';$imgg='http://armor.kiev.ua/wot/images/class3f.png';
+           $textt = $lang['class3f'];$imgg='class3f.png';
            break;
         case ($eff_ratingb > 1452):
-           $textt = 'Оленевод 3-го класса<br>(рейтинг выше, чем у 30% игроков)';$imgg='http://armor.kiev.ua/wot/images/deer3f.png';
+           $textt = $lang['deer3f'];$imgg='deer3f.png';
            break;
         case ($eff_ratingb > 1010):
-           $textt = 'Оленевод 2-го класса<br>(рейтинг выше, чем у 20% игроков)';$imgg='http://armor.kiev.ua/wot/images/deer2f.png';
+           $textt = $lang['deer2f'];$imgg='deer2f.png';
            break;
         case ($eff_ratingb > 517):
-           $textt = 'Оленевод 1-го класса<br>(рейтинг выше, чем у 10% игроков)';$imgg='http://armor.kiev.ua/wot/images/deer1f.png';
+           $textt = $lang['deer1f'];$imgg='deer1f.png';
            break;
         default:
-           $textt = 'Мастер-оленевод<br>(рейтинг ниже, чем у 10% игроков)';$imgg='http://armor.kiev.ua/wot/images/deerMf.png';
+           $textt = $lang['deerMf'];$imgg='deerMf.png';
            break;
      };
 
-     $roster = roster_sort($resall['data']['members']);
+     $roster = roster_sort($resall['data'][$config['clan']]['members']);
      $roster_id = roster_resort_id($roster);
-     $b_pl_mp1 = medal_progress($roster_id, $b_from11, $b_to11);
+     $b_pl_mp1 = medal_progress($roster_id, $medn, $b_from11, $b_to11);
      unset($resall, $roster, $roster_id);
      $count_med = 0;
      Unset($b_pl_mp1['unsort']);
+
      if (isset($b_pl_mp1['sorted'])) {
          foreach ($b_pl_mp1['sorted'] as $mdtype => $val) {
             foreach ($val as $id =>$val2) {
@@ -347,7 +309,7 @@ if (count($b_player_all) >1) {
 ?>
 
 <div align="center">
-<div align="center" class="ui-state-highlight ui-widget-content">Период отображаемых данных c <?php echo date('d.m.Y',$first['up']); ?> по <?php echo date('d.m.Y',$last['up']); ?></div>
+<div align="center" class="ui-state-highlight ui-widget-content">Период отображаемых данных c <?php echo date('d.m.Y',$first['updated_at']); ?> по <?php echo date('d.m.Y',$last['updated_at']); ?></div>
   <table cellspacing="2" cellpadding="2" width="100%" id="tmain">
    <tbody>
     <tr>
@@ -355,7 +317,7 @@ if (count($b_player_all) >1) {
        <table cellspacing="1" cellpadding="1" width="100%" align="center" id="t-table8">
          <thead>
            <tr>
-            <th align="center" colspan="2" ><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="<?=$lang['overall_eff_table'];?>">Рейтинг эффективности (c)</span>
+            <th align="center" colspan="2" ><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="<?=$lang['overall_eff_table'];?>"><?=$lang['eff_ret']; ?> (c)</span>
             <br><a href="http://wot-news.com/" target="_blank">wot-news.com</a></th>
            </tr>
          </thead>
@@ -372,52 +334,52 @@ if (count($b_player_all) >1) {
        <table cellspacing="1" cellpadding="1" width="100%" align="center" id="t-table10">
          <thead>
            <tr>
-             <th align="center" colspan="3">Стиль игры (c) <br><a href="http://emem.ru/" target="_blank">emem.ru</a></th>
+             <th align="center" colspan="3"><?=$lang['emem'];?> (c) <br><a href="http://emem.ru/" target="_blank">emem.ru</a></th>
            </tr>
          </thead>
          <tbody>
            <tr>
-             <td><span class="hidden">1</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="Отношение суммы уничтоженных и обнаруженных врагов к количеству проведенных боев">Общая агресивность</span>:</td>
-             <td><?php $showl = ($last['spot']+$last['des'])/$last['total'];
+             <td><span class="hidden">1</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="<?=$lang['emem_fsb_title'];?>"><?=$lang['emem_fsb'];?></span>:</td>
+             <td><?php $showl = ($last['all_spotted']+$last['all_frags'])/$last['all_battles'];
                        echo number_format($showl,3); ?>
              </td>
-             <td><?php $shown = number_format($showl-($first['spot']+$first['des'])/$first['total'],3);
+             <td><?php $shown = number_format($showl-($first['all_spotted']+$first['all_frags'])/$first['all_battles'],3);
                        if ($shown >  0) echo $darkgreen.'+'.$shown.$darkend;
                        if ($shown <  0) echo $darkred.$shown.$darkend;
                        if ($shown == 0) echo '0'; ?>
              </td>
            </tr>
            <tr>
-             <td><span class="hidden">2</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="Отношение уничтоженных врагов к количеству проведенных боев">Боец</span>:</td>
-             <td><?php echo number_format(($last['des'])/$last['total'],3);?></td>
-             <td><?php $shown = round (($last['des']/$last['total']-$first['des']/$first['total'] ), 3);
+             <td><span class="hidden">2</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="<?=$lang['emem_fb_title'];?>"></span><?=$lang['emem_fb'];?>:</td>
+             <td><?php echo number_format(($last['all_frags'])/$last['all_battles'],3);?></td>
+             <td><?php $shown = round (($last['all_frags']/$last['all_battles']-$first['all_frags']/$first['all_battles'] ), 3);
                        if ($shown >  0) echo $darkgreen.'+'.$shown.$darkend;
                        if ($shown <  0) echo $darkred.$shown.$darkend;
                        if ($shown == 0) echo '0';
                  ?></td>
            </tr>
            <tr>
-             <td><span class="hidden">3</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="Отношение обнаруженных врагов к количеству проведенных боев">Разведчик</span>:</td>
-             <td><?php echo number_format($last['spot']/$last['total'],3);?></td>
-             <td><?php $shown = round (($last['spot']/$last['total']-$first['spot']/$first['total'] ), 3);
+             <td><span class="hidden">3</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="<?=$lang['emem_sb_title'];?>"></span><?=$lang['emem_sb'];?>:</td>
+             <td><?php echo number_format($last['all_spotted']/$last['all_battles'],3);?></td>
+             <td><?php $shown = round (($last['all_spotted']/$last['all_battles']-$first['all_spotted']/$first['all_battles'] ), 3);
                        if ($shown >  0) echo $darkgreen.'+'.$shown.$darkend;
                        if ($shown <  0) echo $darkred.$shown.$darkend;
                        if ($shown == 0) echo '0';
                  ?></td>
            </tr>
            <tr>
-             <td><span class="hidden">4</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="Отношение количества очков захвата базы к количеству проведенных боев">Захватчик</span>:</td>
-             <td><?php echo number_format($last['cap']/$last['total'],3);?></td>
-             <td><?php $shown = round (($last['cap']/$last['total']-$first['cap']/$first['total'] ), 3);
+             <td><span class="hidden">4</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="<?=$lang['emem_cb_title'];?>"></span><?=$lang['emem_cb'];?>:</td>
+             <td><?php echo number_format($last['all_capture_points']/$last['all_battles'],3);?></td>
+             <td><?php $shown = round (($last['all_capture_points']/$last['all_battles']-$first['all_capture_points']/$first['all_battles'] ), 3);
                        if ($shown >  0) echo $darkgreen.'+'.$shown.$darkend;
                        if ($shown <  0) echo $darkred.$shown.$darkend;
                        if ($shown == 0) echo '0';
                  ?></td>
            </tr>
            <tr>
-             <td><span class="hidden">5</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="Отношение сколичества очков защиты базы к количеству проведенных боев">Защитник</span>:</td>
-             <td><?php echo number_format($last['def']/$last['total'],3);?></td>
-             <td><?php $shown = round (($last['def']/$last['total']-$first['def']/$first['total'] ), 3);
+             <td><span class="hidden">5</span><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;" title="<?=$lang['emem_db_title'];?>"></span><?=$lang['emem_db'];?>:</td>
+             <td><?php echo number_format($last['all_dropped_capture_points']/$last['all_battles'],3);?></td>
+             <td><?php $shown = round (($last['all_dropped_capture_points']/$last['all_battles']-$first['all_dropped_capture_points']/$first['all_battles'] ), 3);
                        if ($shown >  0) echo $darkgreen.'+'.$shown.$darkend;
                        if ($shown <  0) echo $darkred.$shown.$darkend;
                        if ($shown == 0) echo '0';
@@ -429,7 +391,7 @@ if (count($b_player_all) >1) {
          <thead>
            <tr>
             <th align="center" colspan="2" ><span class="bb" style="border-bottom: 1px dashed #666666; cursor: pointer;"
-                title="Данный рейтинг не имеет четких показательных границ.">Рейтинг бронесайта (c)</span>
+                title="<?=$lang['brone_anno'];?>"><?=$lang['brone_ret'];?> (c)</span>
                 <br><a href="http://armor.kiev.ua/wot/" target="_blank">armor.kiev.ua/wot</a></th>
            </tr>
          </thead>
@@ -443,7 +405,7 @@ if (count($b_player_all) >1) {
              </td>
            </tr>
            <tr>
-             <td align="center" colspan="2"><?php echo '<img src="'.$imgg.'" />'; ?></td>
+             <td align="center" colspan="2"><?php echo '<img src="/images/brone/'.$imgg.'" />'; ?></td>
            </tr>
            <tr>
              <td align="center" colspan="2"><?=$textt; ?></td>
@@ -458,21 +420,21 @@ if (count($b_player_all) >1) {
           </tr>
          </thead>
        <tbody>
-         <?php foreach($b_new_tank as $id => $val) { //  id, title,tank,nation,lvl, type,link?>
+         <?php foreach($b_new_tank as $id => $val) { //  id, title,tank,nation,level, type,link?>
          <tr style="height:31px;">
             <td>
-              <span class="hidden"><?=$val['lvl'];?></span>
-              <?php if (strlen($val['tank']) > 20) {
-                        $trimmed = substr($val['tank'], 0, 18 );
+              <span class="hidden"><?=$val['level'];?></span>
+              <?php if (strlen($val['name_i18n']) > 20) {
+                        $trimmed = substr($val['name_i18n'], 0, 18 );
                         echo $trimmed.'...';
                     }   else {
-                        echo $val['tank'];
+                        echo $val['name_i18n'];
                     } ?>
             </td>
             <td style="width:131px;">
-               <span class="bb" title="<?php echo $val['tank'].'<br>'.$lang[$val['nation']].'<br>'.$val['lvl'].' lvl<br>'.$lang[$val['type']]; ?>">
+               <span class="bb" title="<?php echo $val['tank'].'<br>'.$lang[$val['nation']].'<br>'.$val['level'].' lvl<br>'.$lang[$val['type']]; ?>">
                  <?php echo '<img src="http://'.$config['gm_url'].'/static/3.6.0.1/common/img/nation/'.$val['nation'].'.png" />';
-                       echo '<img style="right: -45px; position: absolute;" src="http://'.$config['gm_url'].$val['link'].'" />'; ?>
+                       echo '<img style="right: -45px; position: absolute;" src="'.$val['image_small'].'" />'; ?>
                </span>
             </td>
          </tr>
@@ -482,7 +444,7 @@ if (count($b_player_all) >1) {
        <?php };?>
      </td>
      <td valign="top" width="42%">
-       <?php $misc4 = array ('total', 'win', 'lose', 'alive', 'dead_heat');?>
+       <?php $misc4 = array ('all_battles', 'all_wins', 'all_losses', 'all_draws', 'all_survived_battles' );?>
        <table cellspacing="1" cellpadding="1" width="100%" align="center" id="t-table1">
          <thead>
            <tr>
@@ -490,25 +452,27 @@ if (count($b_player_all) >1) {
            </tr>
          </thead>
          <tbody>
-           <?php $i=1; foreach ($misc4 as $val) {?>
+           <?php
+
+           $i=1; foreach ($misc4 as $val) {?>
            <tr>
              <td><span class="hidden"><?=$i; ?></span><?=$lang[$val];?>:</td>
              <td><?php echo round($last[$val]); ?></td>
              <td><?php if ($diff[$val]> 0) echo '+'; echo round($diff[$val]); ?></td>
              <td><?php
-                 if ($val == 'total') {
+                 if ($val == 'all_battles') {
                      echo ' ';
                  } else {
-                    if ($last['total'] <> 0 ){
-                       echo round($last[$val]/$last['total']*100,3).'% ';
+                    if ($last['all_battles'] <> 0 ){
+                       echo round($last[$val]/$last['all_battles']*100,2).'% ';
                     }  else {echo '0%';}
                  }?></td>
              <td><?php
-                 if ($last['total'] <> 0) {
-                     if ($val == 'total') {
-                         $delta = round($diff['total']/$last['total']*100,3);
+                 if ($last['all_battles'] <> 0) {
+                     if ($val == 'all_battles') {
+                         $delta = round($diff['all_battles']/$last['all_battles']*100,3);
                      }   else {
-                         $delta = round(($last[$val]/$last['total']-$first[$val]/$first['total'])*100,3);
+                         $delta = round(($last[$val]/$last['all_battles']-$first[$val]/$first['all_battles'])*100,3);
                      }
                  }   else $delta = 0;
                  if ($delta >0) echo $darkgreen.'+'.$delta.'%'.$darkend;
@@ -519,7 +483,7 @@ if (count($b_player_all) >1) {
            <?php ++$i;}; ?>
        </table>
 
-       <?php $i = 2; $misc = array ('des', 'spot', 'dmg', 'cap', 'def');?>
+       <?php $i = 2; $misc = array ('all_frags', 'all_spotted', 'all_damage_dealt', 'all_capture_points', 'all_dropped_capture_points');?>
        <table cellspacing="1" cellpadding="1" width="100%" align="center" id="t-table2">
          <thead>
            <tr>
@@ -528,10 +492,10 @@ if (count($b_player_all) >1) {
          </thead>
          <tbody>
            <tr>
-             <td><span class="hidden">1</span><?=$lang['accure'];?>:</td>
-             <?php echo '<td>'.$last['accure'].'%</td><td colspan="2">'.' '.'</td><td>';
-                   if ($diff['accure']> 0) {
-                       echo $darkgreen.'+'.$diff['accure'].'%'.$darkend;
+             <td><span class="hidden">1</span><?=$lang['all_hits_percents'];?>:</td>
+             <?php echo '<td>'.$last['all_hits_percents'].'%</td><td colspan="2">'.' '.'</td><td>';
+                   if ($diff['all_hits_percents']> 0) {
+                       echo $darkgreen.'+'.$diff['hits_percents'].'%'.$darkend;
                    }   else {echo '0';} ?>
              </td>
            </tr>
@@ -542,11 +506,11 @@ if (count($b_player_all) >1) {
                        if ($diff[$val]> 0) echo '+';
                        echo $diff[$val]?></td>
              <td><?php
-                 if ($last['total'] <> 0 ){
-                    echo round($last[$val]/$last['total'],2);
+                 if ($last['all_battles'] <> 0 ){
+                    echo round($last[$val]/$last['all_battles'],2);
                  }  else {echo '0';}?></td>
              <td><?php
-                 $delta=round(($last[$val]/$last['total']-$first[$val]/$first['total']),2);
+                 $delta=round(($last[$val]/$last['all_battles']-$first[$val]/$first['all_battles']),2);
                  if ($delta >0) echo $darkgreen.'+'.$delta.$darkend;
                  if ($delta <0) echo $darkred.$delta.$darkend;
                  if ($delta == 0) echo '0';?></td>
@@ -555,7 +519,7 @@ if (count($b_player_all) >1) {
          </tbody>
        </table>
 
-       <?php $misc3 = array ('exp', 'averag_exp', 'max_exp');?>
+       <?php $misc3 = array ('all_xp', 'all_battle_avg_xp', 'max_xp');?>
        <table cellspacing="1" cellpadding="1" width="100%" align="center" id="t-table7">
          <thead>
            <tr>
@@ -577,54 +541,48 @@ if (count($b_player_all) >1) {
          </tbody>
        </table>
 
-       <?php $misc2 = array ('gr', 'wb', 'eb', 'win', 'gpl', 'cpt', 'dmg', 'dpt' ,'frg', 'spt', 'exp');
-             $misc22 = array('_v','_p') ?>
        <table cellspacing="1" cellpadding="0" width="100%" align="center" id="t-table3">
          <thead>
           <tr>
-            <th align="center"><?=$lang['rating_title'];?></th>
-            <th align="center" colspan="2"><?=$lang['value'];?></th>
-            <th align="center" colspan="2"><?=$lang['place'];?></th>
+            <th align="center" colspan="3">Знаки классности</th>
           </tr>
          </thead>
          <tbody>
-               <?php $i = 1; foreach($misc2 as $val) { ?>
+               <?php for($i=1; $i<=4;$i++) {
+                   $shown = $mark_of_mastrery[$i]-$mark_of_mastrery_d[$i]; ?>
            <tr>
-             <td><span class="hidden"><?=$i; ?></span><?=$lang[$val];?>:</td>
-             <?php foreach ($misc22 as $val2) { ?>
-             <td><?=$last[$val.$val2]; ?></td>
-             <td><?php
-                   if ($diff[$val.$val2] >  0) echo $darkgreen.'+'.$diff[$val.$val2].$darkend;
-                   if ($diff[$val.$val2] <  0) echo $darkred.$diff[$val.$val2].$darkend;
-                   if ($diff[$val.$val2] == 0) echo '0';
-                 ?></td> <? } ?>
+             <td><span class="hidden"><?=4-$i; ?></span><img src="<?='http://'.$config['gm_url'].$marks[$i]; ?>" /></td>
+             <td><?=$mark_of_mastrery[$i]; ?></td>
+             <td><?php if ($shown >0) echo $darkgreen.'+'.$shown.$darkend;
+                 if ($shown <0) echo $darkred.$shown.$darkend;
+                 if ($shown == 0) echo '0'; ?></td>
            </tr>
-               <?php ++$i; } ?>
+               <?php } ?>
          </tbody>
        </table>
      </td>
      <td valign="top" width="38%">
-       <?php $misc4 = array ('type', 'nation', 'lvl');
+       <?php $misc4 = array ('type', 'nation', 'level');
              $i=4;
              foreach ($misc4 as $mkey) {?>
 
        <table cellspacing="1" cellpadding="1"  width="100%" align="center" id="t-table<?=$i;?>">
          <thead>
            <tr>
-             <th colspan="7" align="center">Боевая эффективность по
-             <?php if ($mkey == 'type') echo ' классам техники</td></tr><tr><th align="center">Класс техники</th>';
-                   if ($mkey == 'nation') echo ' нациям</td></tr><tr><th align="center" >Нация</th> ';
-                   if ($mkey == 'lvl') echo ' уровням техники</td></tr><tr><th align="center">Уровень</th>';
+             <th colspan="7" align="center"><?=$lang['perform_title'];?>
+             <?php if ($mkey == 'type') echo $lang['perform_class'].'</td></tr><tr><th align="center">'.$lang['class'].'</th>';
+                   if ($mkey == 'nation') echo $lang['perform_nation'].'</td></tr><tr><th align="center" >'.$lang['nation'].'</th> ';
+                   if ($mkey == 'level') echo $lang['perform_lvl'].'</td></tr><tr><th align="center">'.$lang['level'].'</th>';
              ?>
-             <th align="center" colspan="2">Боев</th>
-             <th align="center" colspan="2">Побед</th>
-             <th align="center" colspan="2">% Побед</th>
+             <th align="center" colspan="2"><?=$lang['all_battles'];?></th>
+             <th align="center" colspan="2"><?=$lang['all_wins'];?></th>
+             <th align="center" colspan="2"><?=$lang['winp'];?></th>
            </tr>
          </thead>
          <tbody>
            <?php foreach($b_info[$mkey] as $key_key =>$val) { ?>
            <tr>
-             <td><?php if ($mkey <> 'lvl') {
+             <td><?php if ($mkey <> 'level') {
                            echo $lang[$key_key] ;
                        } else {
                         echo $key_key;
@@ -669,44 +627,28 @@ if (count($b_player_all) >1) {
 <table cellspacing="1" cellpadding="1" width="100%" align="center" id="t-table12">
     <thead>
       <tr>
-        <th colspan="23" align="center">Статистика по отдельным машинам</th>
+        <th colspan="23" align="center"><?=$lang['teh_title'];?></th>
       </tr>
       <tr>
         <th align="center" rowspan="2"><?=$lang['name'];?></th>
-        <th align="center" rowspan="2" colspan="2">Боев</th>
-        <th align="center" colspan="4"><?=$lang['victories'];?></th>
-        <th align="center" colspan="4"><?=$lang['battles_s'];?></th>
-        <th align="center" colspan="4"><?=$lang['spo'];?></th>
-        <th align="center" colspan="4"><?=$lang['damage'];?></th>
-        <th align="center" colspan="4"><?=$lang['destroyed'];?></th>
+        <th align="center" rowspan="2" colspan="2"><?=$lang['all_battles'];?></th>
+        <th align="center" colspan="4"><?=$lang['all_wins'];?></th>
+        <th align="center" colspan="2">Знаки классности</th>
       </tr>
       <tr>
         <th align="center" colspan="2">Кол-во</th>
         <th align="center" colspan="2">%</th>
-        <th align="center" colspan="2">Кол-во</th>
-        <th align="center" colspan="2">%</th>
-        <th align="center" colspan="2">Кол-во</th>
-        <th align="center" colspan="2">Среднее за бой</th>
-        <th align="center" colspan="2">Кол-во</th>
-        <th align="center" colspan="2">Среднее за бой</th>
-        <th align="center" colspan="2">Кол-во</th>
-        <th align="center" colspan="2">Среднее за бой</th>
+        <th align="center" ><?=$lang['name'];?></th>
+        <th align="center" >Дельта</th>
       </tr>
     </thead>
     <tbody>
-    <?
-       foreach ($b_played_tanks as $idkey => $val) {
-          $sql = "SELECT * FROM `col_rating_tank_".$val['nation']."` WHERE account_id = '".$b_res['account_id']."' AND up < '".$b_to11."' AND up >= '".$b_from11."' ORDER BY up DESC;";
-               $q = $db->prepare($sql);
-               if ($q->execute() == TRUE) {
-                   $b_tanks = $q->fetchAll();
-               }   else {
-                   die(show_message($q->errorInfo(),__line__,__file__,$sql));
-               };
-       $b_misc8_sp = array ('_sp', '_dd', '_fr'); ?>
+    <?php
+    foreach ($b_played_tanks as $idkey => $val) {
+       $b_misc8_sp = array ('_mark_of_mastery'); ?>
 
       <tr>
-        <td><span class="hidden"><?=$val['lvl'];?></span>
+        <td><span class="hidden"><?=$val['level'];?></span>
             <?php if (strlen($val['tank']) > 20) {
                       $trimmed = substr($val['tank'], 0, 18 );
                       echo $trimmed.'...';
@@ -715,10 +657,11 @@ if (count($b_player_all) >1) {
                   } ?>
         </td>
         <td><?=$val['total']; ?></td>
-        <?php if ($val['total'] <> $val['total_d']) { ?>
+        <?php if (($val['total'] <> $val['total_d']) && ($val['total'] != 0)){ ?>
         <td>+<?=$val['total_d']; ?></td>
         <td><?=$val['win']; ?></td>
         <td><?php if ($val['win_d']<>0) echo '+';
+
                   echo $val['win_d']; ?></td>
         <td><?php echo round ($val['win']/$val['total']*100,2); ?>%</td>
         <td><?php $shown = Round($val['win']/$val['total']*100 - ($val['win']- $val['win_d'])/($val['total'] - $val['total_d'])*100,2);
@@ -726,51 +669,25 @@ if (count($b_player_all) >1) {
                   if ($shown <  0) echo $darkred.$shown.'%'.$darkend;
                   if ($shown == 0) echo '0%';
             ?></td>
-        <td><?php echo $b_tanks[0][$idkey.'_sb']; ?></td>
-        <td><?php $shown = $b_tanks[0][$idkey.'_sb']-$b_tanks[count($b_tanks)-1][$idkey.'_sb'];
+
+        <td><img src="<?='http://'.$config['gm_url'].$marks[$val['mark_of_mastery']]; ?>" /></td>
+        <td><?php $shown = $val['mark_of_mastery']-$val['mark_of_mastery_d'];
                   if ($shown<>0) echo '+';
                   echo $shown;
             ?></td>
-        <td><?php echo Round($b_tanks[0][$idkey.'_sb']/$val['total']*100,2); ?>%</td>
-        <td><?php $shown = Round($b_tanks[0][$idkey.'_sb']/$val['total']*100 - ($b_tanks[count($b_tanks)-1][$idkey.'_sb'])/($val['total'] - $val['total_d'])*100,2);
-                  if ($shown >  0) echo $darkgreen.'+'.$shown.'%'.$darkend;
-                  if ($shown <  0) echo $darkred.$shown.'%'.$darkend;
-                  if ($shown == 0) echo '0%';
-            ?></td>
-        <?php foreach ($b_misc8_sp as $misk_key) { ?>
 
-        <td><?php echo $b_tanks[0][$idkey.$misk_key]; ?></td>
-        <td><?php $shown = $b_tanks[0][$idkey.$misk_key]-$b_tanks[count($b_tanks)-1][$idkey.$misk_key];
-                  if ($shown<>0) echo '+';
-                  echo $shown;
-            ?></td>
-        <td><?php echo Round($b_tanks[0][$idkey.$misk_key]/$val['total'],2); ?></td>
-        <td><?php $shown = Round($b_tanks[0][$idkey.$misk_key]/$val['total'] - ($b_tanks[count($b_tanks)-1][$idkey.$misk_key])/($val['total'] - $val['total_d']),2);
-                  if ($shown >  0) echo $darkgreen.'+'.$shown.$darkend;
-                  if ($shown <  0) echo $darkred.$shown.$darkend;
-                  if ($shown == 0) echo '0';
-            ?></td>
+        <?php
 
-
-        <?php } ;
-
-        } else { ?>
+        }   else {
+            if ($val['total'] == 0 ) $val['total'] = 1;?>
         <td><?php echo '-'; ?></td>
         <td><?=$val['win']; ?></td>
         <td><?php echo '-'; ?></td>
         <td><?php echo round ($val['win']/$val['total']*100,2); ?>%</td>
         <td><?php echo '-'; ?></td>
-        <td><?php echo $b_tanks[0][$idkey.'_sb']; ?></td>
+        <td><?php if ($val['mark_of_mastery'] <> 0) {echo '<img src="http://'.$config['gm_url'].$marks[$val['mark_of_mastery']].'" />';} else {echo '-';} ?></td>
         <td><?php echo '-'; ?></td>
-        <td><?php echo Round($b_tanks[0][$idkey.'_sb']/$val['total']*100,2); ?>%</td>
-        <td><?php echo '-'; ?></td>
-        <?php foreach ($b_misc8_sp as $misk_key) { ?>
-
-        <td><?php echo $b_tanks[0][$idkey.$misk_key]; ?></td>
-        <td><?php echo '-'; ?></td>
-        <td><?php echo Round($b_tanks[0][$idkey.$misk_key]/$val['total'],2); ?></td>
-        <td><?php echo '-'; ?></td>
-        <?php } }; ?>
+        <?php }; ?>
       </tr>
 <?   $i++;  } ?>
     </tbody>
@@ -779,7 +696,7 @@ if (count($b_player_all) >1) {
 <? };
 if ($count_med>0) {
       if (isset($b_pl_mp['major'])) {
-         $sql = "SELECT medalCarius, medalEkins, medalKay, medalLeClerc, medalAbrams, medalPoppel, medalLavrinenko, medalKnispel FROM `col_medals` WHERE account_id = '".$b_res['account_id']."' AND up < '".$b_to11."' AND up >= '".$b_from11."' ORDER BY up DESC;";
+         $sql = "SELECT medal_carius, medal_ekins, medal_kay, medal_le_clerc, medal_abrams, medal_poppel, medal_lavrinenko, medal_knispel FROM `col_medals` WHERE account_id = '".$b_res['account_id']."' AND updated_at < '".$b_to11."' AND updated_at >= '".$b_from11."' ORDER BY updated_at DESC;";
          $q = $db->prepare($sql);
          if ($q->execute() == TRUE) {
              $b_medals = $q->fetchAll();
@@ -787,7 +704,7 @@ if ($count_med>0) {
              die(show_message($q->errorInfo(),__line__,__file__,$sql));
          };
          foreach ($b_pl_mp['major'] as $key => $val){
-            if (($val < 0) ) {
+            if (($val > 0) ) {
                  $b_pl_mp['major'][$key]=$b_medals[0][$key];
             }
          }
@@ -797,7 +714,7 @@ if ($count_med>0) {
 <table cellspacing="1" cellpadding="1" width="100%" id="t-table13">
   <thead>
     <tr>
-      <th>Статистика по наградам и достижениям</th>
+      <th><?=$lang['med_title'];?></th>
     </tr>
   </thead>
   <tbody>
@@ -820,7 +737,7 @@ if ($count_med>0) {
                if (($type_key == 'major') && ($val <> '0')) {$tm2 .= $val;};
                if ($tm<>'lumberjack') { ?>
                   <div class="medalDiv">
-                    <img width="67" height="71" title="<?php echo '<center>'.$lang['medal_'.$tm].'</center>'.$lang['title_'.$tm]; ?>" class="bb <?php if($val == 0) {echo 'faded';} ?>" alt="<?=$lang['title_'.$tm]; ?>" src="<?php echo './images/medals/'.$tm2.'.png'; ?>">
+                    <img width="67" height="71" title="<?php echo '<center>'.$lang['medal_'.$tm].'</center>'.$lang['title_'.$tm]; ?>" class="bb <?php if($val == 0) {echo 'faded';} ?>" alt="<?=$lang['title_'.$tm]; ?>" src="<?=$medn[$tm]['img']; ?>">
                     <div class="a_num ui-state-highlight ui-widget-content"><?=$val; ?></div>
                   </div>
           <?   }
@@ -836,5 +753,6 @@ if ($count_med>0) {
     <div align="center" class="ui-state-highlight ui-widget-content"><?=$lang['error_cron_off_or_none'];?></div>
   <?php };
 } else echo '<div align="center" class="ui-state-highlight ui-widget-content">Выберите две корректные даты!</div>';
+
 Unset($b_tanks);
 ?>

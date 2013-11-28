@@ -15,8 +15,7 @@
     *
     */
 ?>
-<?php $mindate = array();
-      foreach($res as $name => $val){
+<?php foreach($res as $name => $val){
          $arrname[$name]= strtoupper($name);
       }
       asort($arrname);
@@ -71,11 +70,11 @@ function smtmagic()
                 }),
                 url: "./ajax/player_result.php",
                 success: function(msg){
-                    $("#player_result").addClass("ui-state-disabled");
-                    $("#player_result").html(msg).show();
+                    $("#dyn_player_result").addClass("ui-state-disabled");
+                    $("#dyn_player_result").html(msg).show();
                 },
                 complete: function() {
-                  $("#player_result").removeClass("ui-state-disabled");
+                  $("#dyn_player_result").removeClass("ui-state-disabled");
                   check_Width($("table#tmain"), $("div#tabs-<?=$key;?>"));
                 }
             });
@@ -86,7 +85,7 @@ function smtmagic()
 });
 </script>
 <?php $mindate = array(); ?>
-<div align="center" id="ajax_player_result_width">
+<div align="center" id="ajax_dyn_player_result_width">
     <form method="post" enctype="multipart/form-data">
     <br />
     <?=$lang['name'];?>
@@ -101,5 +100,5 @@ function smtmagic()
     <input type="text" id="b_to" name="b_to" value="" />
     <a href="#tabs-<?php echo $key; ?>" id="b_show_activity"><?=$lang['select_show'];?></a>
     </form>
-    <div id="player_result"></div>
+    <div id="dyn_player_result"></div>
 </div>
