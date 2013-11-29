@@ -5,22 +5,23 @@
     * Link:        http://creativecommons.org/licenses/by-nc-sa/3.0/
     * -----------------------------------------------------------------------
     * Began:       2012
-    * Date:        $Date: 2012-12-01 $
+    * Date:        $Date: 2013-11-29 $
     * -----------------------------------------------------------------------
     * @author      $Author: SHW $
-    * @copyright   2011-2012 SHW
+    * @copyright   2012-2013 SHW
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 2.2.0 $
+    * @version     $Rev: 3.0.0 $
     *
     */
 ?>
-<?php foreach($res as $name => $val){
+<?php $mindate = array();
+      foreach($res as $name => $val){
          $arrname[$name]= strtoupper($name);
       }
       asort($arrname);
       foreach($arrname as $key2 => $name){
-         $sql = "SELECT MIN(up) FROM `col_players` where name='".$key2."';";
+         $sql = "SELECT MIN(updated_at) FROM `col_players` where nickname='".$key2."';";
          $q = $db->prepare($sql);
          if ($q->execute() == TRUE) {
              $mindate[$key2] = $q->fetchColumn();
@@ -84,7 +85,6 @@ function smtmagic()
         smtmagic();
 });
 </script>
-<?php $mindate = array(); ?>
 <div align="center" id="ajax_dyn_player_result_width">
     <form method="post" enctype="multipart/form-data">
     <br />
