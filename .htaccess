@@ -1,3 +1,5 @@
+ErrorDocument 404 /_err/404.php
+
 RewriteEngine on
 
 #Set default T1NCO
