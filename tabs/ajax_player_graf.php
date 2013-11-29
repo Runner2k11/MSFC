@@ -15,25 +15,25 @@
     *
     */
 ?>
-<?php $mindate = array();
+<?php $mindate_g = array();
       foreach($res as $name => $val){
-         $arrname[$name]= strtoupper($name);
+         $arrname_g[$name]= strtoupper($name);
       }
-      asort($arrname);
-      foreach($arrname as $key2 => $name){
-         $sql = "SELECT MIN(up) FROM `col_players` where name='".$key2."';";
+      asort($arrname_g);
+      foreach($arrname_g as $key2 => $name){
+         $sql = "SELECT MIN(updated_at) FROM `col_players` where nickname='".$key2."';";
          $q = $db->prepare($sql);
          if ($q->execute() == TRUE) {
-             $mindate[$key2] = $q->fetchColumn();
+             $mindate_g[$key2] = $q->fetchColumn();
          }   else {
-             $mindate[$key2] = 0;
+             $mindate_g[$key2] = 0;
          }
       }
 ?>
 <script type="text/javascript">
-function smtmagic()
+function smtmagic_g()
         {
-            miscval = <?php if (isset($mindate)) {echo json_encode($mindate);} else {echo 'array ();';}; ?>;
+            miscval = <?php if (isset($mindate_g)) {echo json_encode($mindate_g);} else {echo 'array ();';}; ?>;
             $( "#b_from_graf" ).datepicker( "option", "minDate", new Date(miscval[$('#b_player_graf').val()]*1000) );
             if ($('#b_from_graf').val() >= $('#b_to_graf').val()) { $( "#b_to" ).datepicker( "setDate", new Date()); }
         };
@@ -68,6 +68,7 @@ function smtmagic()
                   b_to     : $('#b_to_graf').val(),
                   b_player : $('#b_player_graf').val(),
 				  b_w	   : $('#b_w_graf').val(),
+				  b_type   : $('#b_type').val(),
                   db_pref : '<?php echo $db->prefix; ?>'
                 }),
                 url: "./ajax/player_result_graf.php",
@@ -83,28 +84,34 @@ function smtmagic()
             return false;
         });
         $("#b_show_activity_graf").click();
-        smtmagic();
+        smtmagic_g();
 });
 </script>
-<?php $mindate = array(); ?>
+
 <div align="center" id="ajax_player_result_width_graf">
     <form method="post" enctype="multipart/form-data">
     <br />
     <?=$lang['name'];?>
-    <select id="b_player_graf" onchange="smtmagic();">
-            <?php foreach($arrname as $key2 => $name){ ?>
+    <select id="b_player_graf" onchange="smtmagic_g();">
+            <?php foreach($arrname_g as $key2 => $name){ ?>
             <option value="<?=$key2;?>"><?=$key2;?></option>
             <?php } ?>
     </select>
+	<select id="b_type">
+			<option value="b_type_1"><?=$lang['b_type_1'];?></option>
+			<option value="b_type_2"><?=$lang['b_type_2'];?></option>
+			<option value="b_type_3"><?=$lang['b_type_3'];?></option>
+	</select>
     <select id="b_w_graf" >
             <option value="eff"><?=$lang['b_w_graf_1'];?></option>
-			<option value="dmg"><?=$lang['b_w_graf_2'];?></option>
-			<option value="des"><?=$lang['b_w_graf_3'];?></option>
-			<option value="spot"><?=$lang['b_w_graf_4'];?></option>
-			<option value="cap"><?=$lang['b_w_graf_5'];?></option>
-			<option value="def"><?=$lang['b_w_graf_6'];?></option>
-			<option value="lvl"><?=$lang['b_w_graf_7'];?></option>
+			<option value="all_damage_dealt"><?=$lang['b_w_graf_2'];?></option>
+			<option value="all_frags"><?=$lang['b_w_graf_3'];?></option>
+			<option value="all_spotted"><?=$lang['b_w_graf_4'];?></option>
+			<option value="all_capture_points"><?=$lang['b_w_graf_5'];?></option>
+			<option value="all_dropped_capture_points"><?=$lang['b_w_graf_6'];?></option>
+			<option value="level"><?=$lang['b_w_graf_7'];?></option>
 			<option value="dey"><?=$lang['b_w_graf_8'];?></option>
+			<option value="all_wins"><?=$lang['b_w_graf_9'];?></option>
     </select>
 	<?=$lang['graf_1'];?>
 	<input type="text" id="b_from_graf" name="b_from_graf" value="" />
@@ -112,6 +119,6 @@ function smtmagic()
     <input type="text" id="b_to_graf" name="b_to_graf" value="" />
     <a href="#tabs-<?php echo $key; ?>" id="b_show_activity_graf"><?=$lang['select_show'];?></a>
     </form>
-	<br/><?=$lang['graf_3'];?>
+	
     <div id="player_result_graf"></div>
 </div>
