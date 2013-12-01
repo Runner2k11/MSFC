@@ -644,7 +644,10 @@ if (count($b_player_all) >1) {
     </thead>
     <tbody>
     <?php
+    $total_d_all = $win_d_all = 0;
     foreach ($b_played_tanks as $idkey => $val) {
+       $total_d_all += $val['total_d'];
+       $win_d_all += $val['win_d'];
        $b_misc8_sp = array ('_mark_of_mastery'); ?>
 
       <tr>
@@ -691,6 +694,22 @@ if (count($b_player_all) >1) {
       </tr>
 <?   $i++;  } ?>
     </tbody>
+    <tfoot>
+      <tr>
+        <td colspan=2></td>
+        <td>+<?php echo $total_d_all; ?></td>
+        <td></td>
+        <td>+<?php echo $win_d_all; ?></td>
+        <td><?php echo Round($win_d_all/$total_d_all*100,2); ?>%</td>
+        <td><?php
+          $windiff = Round($win_d_all/$total_d_all*100 - $last['all_wins']/$last['all_battles']*100,2);
+          if ($windiff >  0) echo $darkgreen.'+'.$windiff.'%'.$darkend;
+          if ($windiff <  0) echo $darkred.$windiff.'%'.$darkend;
+          if ($windiff == 0) echo '0%';
+        ?></td>
+        <td colspan=2></td>
+      </tr>
+    </tfoot>
 </table>
 </div>
 <? };
