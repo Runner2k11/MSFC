@@ -5,7 +5,7 @@
     * Link:        http://creativecommons.org/licenses/by-nc-sa/3.0/
     * -----------------------------------------------------------------------
     * Began:       2012
-    * Date:        $Date: 2012-12-01
+    * Date:        $Date: 2013-11-28
     * -----------------------------------------------------------------------
     * @author      $Author: SHW $
     * @copyright   2012-2013 SHW
@@ -161,7 +161,7 @@ if (count($b_player_all) >1) {
               if (isset($tanks[count($tanks)-1][$id.'_mark_of_mastery'])){$mark_of_mastrery_d[$tanks[count($tanks)-1][$id.'_mark_of_mastery']] ++;}
               if (($tanks[count($tanks)-1][$id.'_battles'] == '0')&&($tanks[0][$id.'_battles'] > 0)) $b_new_tank[$id] = $b_tank_name[$id];
               if ($tanks[count($tanks)-1][$id.'_battles'] <> $tanks[0][$id.'_battles']) {
-                 $b_played_tanks[$id]['tank'] =  $b_tank_name[$id]['name_i18n'];
+                 $b_played_tanks[$id]['name_i18n'] =  $b_tank_name[$id]['name_i18n'];
                  $b_played_tanks[$id]['nation'] = $val['nation'];
                  $b_played_tanks[$id]['total'] = $tanks[0][$id.'_battles'];
                  $b_played_tanks[$id]['mark_of_mastery'] = $tanks[0][$id.'_mark_of_mastery'];
@@ -405,7 +405,7 @@ if (count($b_player_all) >1) {
              </td>
            </tr>
            <tr>
-             <td align="center" colspan="2"><?php echo '<img src="/images/brone/'.$imgg.'" />'; ?></td>
+             <td align="center" colspan="2"><?php echo '<img src="./images/brone/'.$imgg.'" />'; ?></td>
            </tr>
            <tr>
              <td align="center" colspan="2"><?=$textt; ?></td>
@@ -432,7 +432,7 @@ if (count($b_player_all) >1) {
                     } ?>
             </td>
             <td style="width:131px;">
-               <span class="bb" title="<?php echo $val['tank'].'<br>'.$lang[$val['nation']].'<br>'.$val['level'].' lvl<br>'.$lang[$val['type']]; ?>">
+               <span class="bb" title="<?php echo $val['name_i18n'].'<br>'.$lang[$val['nation']].'<br>'.$val['level'].' lvl<br>'.$lang[$val['type']]; ?>">
                  <?php echo '<img src="http://'.$config['gm_url'].'/static/3.6.0.1/common/img/nation/'.$val['nation'].'.png" />';
                        echo '<img style="right: -45px; position: absolute;" src="'.$val['image_small'].'" />'; ?>
                </span>
@@ -649,11 +649,11 @@ if (count($b_player_all) >1) {
 
       <tr>
         <td><span class="hidden"><?=$val['level'];?></span>
-            <?php if (strlen($val['tank']) > 20) {
-                      $trimmed = substr($val['tank'], 0, 18 );
+            <?php if (strlen($val['name_i18n']) > 20) {
+                      $trimmed = substr($val['name_i18n'], 0, 18 );
                       echo $trimmed.'...';
                   }   else {
-                      echo $val['tank'];
+                      echo $val['name_i18n'];
                   } ?>
         </td>
         <td><?=$val['total']; ?></td>
