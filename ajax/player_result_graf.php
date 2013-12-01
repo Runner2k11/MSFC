@@ -150,7 +150,7 @@ If (($b_from<>'') && ($b_to<>'') ) {
 		return $result;
 	};
 	
-	$sql = "SELECT * FROM  `col_players` WHERE account_id = '".$b_res['account_id']."' AND updated_at < '".$b_to11."' AND updated_at >= '".$b_from11."' ORDER BY updated_at DESC;";
+	$sql = "SELECT * FROM  `col_players` WHERE account_id = '".$b_res['account_id']."' AND updated_at < '".$b_to11."' AND updated_at >= '".$b_from11."' ORDER BY updated_at ASC;";
 	$q = $db->prepare($sql);
           if ($q->execute() == TRUE) {
               $b_player_all = $q->fetchAll();
@@ -330,6 +330,7 @@ If (($b_from<>'') && ($b_to<>'') ) {
 
 <div id="chart_graf" style="height:600px; width:800px;"></div>
 <? 
+
 } else echo '<div align="center" class="ui-state-highlight ui-widget-content">Выберите две корректные даты!</div>';
 
 
