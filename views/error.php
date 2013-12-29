@@ -11,10 +11,12 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.0 $
+    * @version     $Rev: 3.0.2 $
     *
     */
-
-
-echo error_rep($multiclan_info[$config['clan']]['error'],$lang);
+if (isset ($multiclan_info[$config['clan']]['error'])) {
+    echo error_rep($multiclan_info[$config['clan']]['error'],$lang)
+}   else {
+    echo $lang['error_1'];
+}
 ?>

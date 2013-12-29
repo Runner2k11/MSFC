@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.0 $
+    * @version     $Rev: 3.0.2 $
     *
     */
 
@@ -423,4 +423,5 @@
     $lang['nation'] = 'Нация техники';
     $lang['level'] = 'Уровень техники';
     $lang['teh_anno'] = '*В таблице отображается только та техника, на которой проведено не менее 20 боев.';
+    $lang['avr_eff_ret'] = 'Средний РЭ';
 ?>

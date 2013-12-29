@@ -8,14 +8,14 @@
     * Date:        $Date: 2011-10-24 11:54:02 +0200 $
     * -----------------------------------------------------------------------
     * @author      $Author: Edd, Exinaus, Shw  $
-    * @copyright   2011-2012 Edd - Aleksandr Ustinov
+    * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.0 $
+    * @version     $Rev: 3.0.2 $
     *
     */
-
-
+?>
+<?php
   $lang['overall_eff_table'] = '<table cellspacing=\'0\' cellpadding=\'2\' border=\'0\' class=\'ui-widget ui-widget-content\' style=\'border-width:0px;background-image:none;\'>
 <tr>
   <td colspan=\'2\' align=\'center\'><strong>Tabela znaczeń rankingu wydajności</strong></td>
@@ -90,7 +90,7 @@
 </tr>
 <tr>
   <td align=\'center\'>mniej 2080</td>
-  <td align=\'center\'> <font color=\'red\'>Pasterze? (wszystkie klasy)</font> (~45%)</td>
+  <td align=\'center\'> <font color=\'red\'>Nooby (wszystkie klasy)</font> (~45%)</td>
 </tr>
 
 <tr>

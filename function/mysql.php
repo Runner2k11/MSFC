@@ -8,10 +8,10 @@
     * Date:        $Date: 2011-10-24 11:54:02 +0200 $
     * -----------------------------------------------------------------------
     * @author      $Author: Edd, Exinaus, Shw  $
-    * @copyright   2011-2012 Edd - Aleksandr Ustinov
+    * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.0 $
+    * @version     $Rev: 3.0.2 $
     *
     */
     if (preg_match ("/mysql.php/", $_SERVER['PHP_SELF']))
@@ -139,7 +139,7 @@
     $db->query ( 'SET character_set_connection = '.$sqlchar );
     $db->query ( 'SET character_set_client = '.$sqlchar );
     $db->query ( 'SET character_set_results = '.$sqlchar );
-    $db->query ( 'SET SESSION wait_timeout = 180;');
+    $db->query ( 'SET SESSION wait_timeout = 120;');
 
     if(isset($_GET['multi']) and preg_match("/[a-zA-Z0-9]{1,5}/i", $_GET['multi']) and (strlen($_GET['multi'])<=5)) {
 
