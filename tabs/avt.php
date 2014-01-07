@@ -333,92 +333,86 @@ if($config['cron'] == 1 && $col_check > 2 && count($main_progress['main']) > 0){
    </tbody>
  </table>
 
-    <?php if($config['cron'] == 1 && $col_check > 2 && count($main_progress['main']) > 0){ ?>
-        <table cellspacing="0" cellpadding="0" width="100%" style="border-width: 0; ">
-            <tbody>
-                <tr>
-                    <td valign="top" width="35%">
-                        <table cellspacing="2" cellpadding="0" width="100%" id="avt7">
-                            <thead style="font-weight: bold;">
-                               <tr><th align="center" colspan="4"><?=$lang['loosed_today'];?></th></tr>
-                               <tr style='display: none'><th></th><th></th><th></th><th></th></tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($we_loosed) > 0){
-                                         foreach($we_loosed as $val){ ?>
-                                        <tr>
-                                            <td align="left"><a href="<?php echo $config['base'],$val['nickname'],'/'; ?>"
-                                                    target="_blank"><?=$val['nickname'];?></a></td>
-                                            <td align="center"><?=$lang[$val['role']];?></td>
-                                            <td align="center"><?php echo floor(($val['updated_at'] - mktime(0, 0, 0, date("m", $val['created_at']), date("d", $val['created_at']), date("Y", $val['created_at'])))/(3600*24)),$lang['days'];?></td>
-                                            <td align="center"><span class="hidden"><?=$val['updated_at'];?></span><?php echo date('d.m.Y',$val['updated_at']);?></td>
-                                        </tr>
-                                        <?php }
-                                          }else{ ?>
-                                    <tr>
-                                        <td colspan="4" align="center"><?=$lang['noone'];?></td>
-                                    </tr>
-                                    <?php } ?>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td valign="top">
-                        <table cellspacing="2" cellpadding="0" width="100%" id="avt8" style="position: relative;">
-                            <thead style="font-weight: bold;">
-                               <th colspan="3" align="center"><?=$lang['new_tanks'];?></th>
-                            </thead>
-                            <tbody>
-                                <?php if (count($new_tanks) > 0){
-                                      foreach($new_tanks as $val){ ?>
-                                        <tr>
-                                            <td align="left"><a href="<?php echo $config['base'],$roster_id[$val['account_id']]['account_name'],'/'; ?>"
-                                                    target="_blank"><?=$roster_id[$val['account_id']]['account_name'];?></a></td>
-                                            <td width="130px" align="left">
-                                              <?php echo '<div style="position:relative;"><img src="http://',$config['gm_url'],'/static/3.6.0.1/common/img/nation/',$tanks[$val['tank_id']]['nation'],'.png" />',
-                                                         '<img style="right:-50px; position:absolute;" src="',$tanks[$val['tank_id']]['image_small'],'" /></div>'; ?>
-                                            </td>
-                                            <td  align="center">
-                                              <?=$tanks[$val['tank_id']]['name_i18n']; ?>
-                                            </td>
-
-
-                                        </tr>
-                                        <?php } } else { ?>
-                                    <tr>
-                                        <td colspan="3" align="center"><?=$lang['no_new']; ?></td>
-                                    </tr>
-                                    <?php } ?>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td valign="top" width="35%">
-                        <table cellspacing="2" cellpadding="0" width="100%" id="avt9">
-                            <thead style="font-weight: bold;">
-                              <tr><th align="center" colspan="4"><?=$lang['new_players'];?></th></tr>
-                              <tr style='display: none'><th></th><th></th><th></th><th></th></tr>
-                            </thead>
-                            <tbody> 
-                                <?php if (count($new_players) > 0){
-                                         foreach($new_players as $name => $val){ ?>
-                                        <tr>
-                                            <td align="left"><a href="<?php echo $config['base'],$val['nickname'],'/'; ?>"
-                                                    target="_blank"><?=$val['nickname'];?></a></td>
-                                            <td align="center"><?=$lang[$val['role']];?></td>
-                                            <td align="center"><?php echo floor((time() - mktime(0, 0, 0, date("m", $val['created_at']), date("d", $val['created_at']), date("Y", $val['created_at'])))/(3600*24)),$lang['days'];?></td>
-                                            <td align="center"><span class="hidden"><?=$val['created_at'];?></span><?php echo date('d.m.Y',$val['created_at']);?></td>
-                                        </tr>
-                                        <?php }
-                                          }else{ ?>
-                                    <tr>
-                                        <td colspan="4" align="center"><?=$lang['noone'];?></td>
-                                    </tr>
-                                    <?php } ?>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <? };?>
+<?php if($config['cron'] == 1 && $col_check > 2 && count($main_progress['main']) > 0){ ?>
+   <table cellspacing="0" cellpadding="0" width="100%" style="border-width: 0; ">
+      <tbody>
+         <tr>
+            <td valign="top" width="35%">
+               <table cellspacing="2" cellpadding="0" width="100%" id="avt7">
+                  <thead style="font-weight: bold;">
+                     <tr>
+                        <th colspan="4" align="center"><?=$lang['loosed_today'];?></th>
+                     </tr>
+                     <tr style='display: none'><th></th><th></th><th></th><th></th></tr>
+                  </thead>
+                  <tbody>
+                     <?php if (count($we_loosed) > 0){
+                        foreach($we_loosed as $val){ ?>
+                           <tr>
+                              <td align="left"><a href="<?php echo $config['base'],$val['nickname'],'/'; ?>" target="_blank"><?=$val['nickname'];?></a></td>
+                              <td align="center"><?=$lang[$val['role']];?></td>
+                              <td align="center"><?php echo floor(($val['updated_at'] - mktime(0, 0, 0, date("m", $val['created_at']), date("d", $val['created_at']), date("Y", $val['created_at'])))/(3600*24)),$lang['days'];?></td>
+                              <td align="center"><span class="hidden"><?=$val['updated_at'];?></span><?php echo date('d.m.Y',$val['updated_at']);?></td>
+                           </tr>
+                        <?php }
+                     }  else {
+                        echo '<tr><td colspan="4" align="center">',$lang['noone'],'</td></tr>';
+                     } ?>
+                  </tbody>
+               </table>
+            </td>
+            <td valign="top">
+               <table cellspacing="2" cellpadding="0" width="100%" id="avt8" style="position: relative;">
+                  <thead style="font-weight: bold;">
+                     <th colspan="3" align="center"><?=$lang['new_tanks'];?></th>
+                  </thead>
+                  <tbody>
+                     <?php if (count($new_tanks) > 0){
+                        foreach($new_tanks as $val){ ?>
+                           <tr>
+                              <td align="left"><a href="<?php echo $config['base'],$roster_id[$val['account_id']]['account_name'],'/'; ?>"
+                                                target="_blank"><?=$roster_id[$val['account_id']]['account_name'];?></a></td>
+                              <td width="130px" align="left">
+                                 <div style="position:relative; min-height:31px; padding: 0px; background: url('http://<?=$config['gm_url'];?>/static/3.6.0.1/common/img/nation/<?=$tanks[$val['tank_id']]['nation'];?>.png') no-repeat scroll 0 0 transparent;">
+                                 <img style="right:-50px; position:absolute; padding: 0px;" src="<?=$tanks[$val['tank_id']]['image_small'];?>" /></div>
+                              </td>
+                              <td align="center">
+                                 <?=$tanks[$val['tank_id']]['name_i18n']; ?>
+                              </td>
+                           </tr>
+                     <?php } }  else {
+                                echo '<tr><td colspan="3" align="center">',$lang['no_new'],'</td></tr>';
+                             } ?>
+                  </tbody>
+               </table>
+            </td>
+            <td valign="top" width="35%">
+               <table cellspacing="2" cellpadding="0" width="100%" id="avt9">
+                  <thead style="font-weight: bold;">
+                     <tr>
+                        <th colspan="4" align="center"><?=$lang['new_players'];?></th>
+                     </tr>
+                     <tr style='display: none'><th></th><th></th><th></th><th></th></tr>
+                  </thead>
+                  <tbody>
+                     <?php if (count($new_players) > 0){
+                        foreach($new_players as $name => $val){ ?>
+                           <tr>
+                              <td align="left"><a href="<?php echo $config['base'],$val['nickname'],'/'; ?>" target="_blank"><?=$val['nickname'];?></a></td>
+                              <td align="center"><?=$lang[$val['role']];?></td>
+                              <td align="center"><?php echo floor((time() - mktime(0, 0, 0, date("m", $val['created_at']), date("d", $val['created_at']), date("Y", $val['created_at'])))/(3600*24)),$lang['days'];?></td>
+                              <td align="center"><span class="hidden"><?=$val['created_at'];?></span><?php echo date('d.m.Y',$val['created_at']);?></td>
+                           </tr>
+                        <?php }
+                     }  else {
+                        echo '<tr><td colspan="4" align="center">',$lang['noone'],'</td></tr>';
+                     } ?>
+                  </tbody>
+               </table>
+            </td>
+         </tr>
+      </tbody>
+   </table>
+<? };?>
 </div>
 <?php unset($avtdmg,$avt_eff,$avt,$avt_,$avt_mexp,$h24); ?>
