@@ -20,6 +20,12 @@
         echo $message;
     }
 ?>
+<!--LiveInternet counter--><script type="text/javascript"><!--
+new Image().src = "//counter.yadro.ru/hit?r"+
+escape(document.referrer)+((typeof(screen)=="undefined")?"":
+";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+";"+Math.random();//--></script><!--/LiveInternet-->
 <div id="allcontainer" style="min-height: 100%; width:100%; padding: 0; margin: 0; border: 0px inset black !important;"
     class="ui-accordion-content ui-widget-content ui-accordion-content-active">
     <?php if(count($multiclan) > 1){ ?>
@@ -191,6 +197,10 @@
       document.write('<img src="./counter/counter2.php?rand='+Math.random()+'">');
     //--></script></a><br>
 
-    &nbsp;<img width='88' height='31' border='0' alt='uptime' src="http://ext.host-tracker.com/uptime-img/?s=31&amp;t=12120310&amp;m=00.09&amp;p=Total&amp;src=lvuc" />
+    &nbsp;<img width='88' height='31' border='0' alt='uptime' src="http://ext.host-tracker.com/uptime-img/?s=31&amp;t=12120310&amp;m=00.09&amp;p=Total&amp;src=lvuc" />&nbsp;
+    <!--LiveInternet logo--><a href="http://www.liveinternet.ru/click"
+    target="_blank"><img src="//counter.yadro.ru/logo?22.6"
+    title="LiveInternet: показано число просмотров за 24 часа, посетителей за 24 часа и за сегодня"
+    alt="" border="0" width="88" height="31"/></a><!--/LiveInternet-->
 </center>
 </div>
