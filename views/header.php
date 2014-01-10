@@ -46,6 +46,7 @@
     <script type="text/javascript">
         $("#allcontainer").css({'height': $(window).height(), 'width': $(window).width(), 'overflow-x': 'hidden', 'overflow-y': 'hidden' });
         $(document).ready(function() {
+              $("#perform_all_n").tablesorter({sortList:[[0,0]], widgets: ['uitheme','stickyheaders','zebra'] });
               $("#roster").tablesorter({sortList:[[5,0],[4,1],[1,0]], headers:{ 0: { sorter: false}}});
 
               $("#best_main")
