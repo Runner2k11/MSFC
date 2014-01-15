@@ -15,6 +15,18 @@
     *
     */
 ?>
+<?php
+    $roster_local_array = array();
+    $sql = "SELECT p.nickname, updated_at FROM ".$db->prefix."col_players p, (SELECT max( all_battles ) AS maxb, nickname FROM ".$db->prefix."col_players GROUP BY nickname) m WHERE p.all_battles = m.maxb AND p.nickname = m.nickname GROUP BY p.nickname";
+    $q = $db->prepare($sql);
+    if ($q->execute() == TRUE) {
+        foreach($q->fetchAll() as $val){
+            $roster_local_array[$val['nickname']] = (int) $val['updated_at'];
+        }
+    } else {
+        die(show_message($q->errorInfo(),__line__,__file__,$sql));
+    }
+?>
 <div align="center">
     <table id="roster" width="100%" cellspacing="1" class="table-id-<?=$key;?>">
         <thead>
@@ -37,10 +49,9 @@
                     } else {
                         $date = date('Y.m.d',$val['created_at']);
                     }
-                    if (isset($res[$val['account_name']]['data']['updated_at']) && ($res[$val['account_name']]['data']['updated_at'] <>0)) {
-                        $roster_local_num = $res[$val['account_name']]['data']['updated_at'];
-                        $diff_date = round(((time() - $roster_local_num) / 86400),0);
-
+                    if (array_key_exists($val['account_name'], $roster_local_array)){
+                        $roster_local_num = $roster_local_array[$val['account_name']];
+                        $diff_date = floor((time() - $roster_local_num) / 86400);
                         switch ($diff_date+1) { // Ну вот глючит switch при 0-м значении, хоть убей его. Кто в курсе решения проблемы, сообщите
                         case ($diff_date <= 3):
                         $color = 'col_blue';
@@ -61,6 +72,7 @@
                     }   else {
                         $roster_local_num = 'Н/Д';
                         $color = 'col_black';
+                        $diff_date = 0;
                     }
                 ?>
                 <tr>
@@ -81,8 +93,7 @@
                                  <?php echo date('Y.m.d (H:i)',$roster_local_num);
                               } else {echo $roster_local_num;}; ?></td>
                     <td><?php
-                        $diff_time_hours = floor((time() - $roster_local_num) / 3600);
-                        printf('%02dд. %02dч.', floor($diff_time_hours/24), $diff_time_hours%24);
+                        if ($diff_date != 0) printf('%02d д.', $diff_date);
                     ?></td>
                 </tr>
                 <?php } ?>
