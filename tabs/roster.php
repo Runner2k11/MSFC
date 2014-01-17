@@ -16,15 +16,20 @@
     */
 ?>
 <?php
+     $sql = "SELECT MIN(updated_at) FROM ".$db->prefix."col_players";
+     $q = $db->prepare($sql);
+     if ($q->execute() == TRUE) {
+         $mindate = (int) $q->fetchColumn();
+     }   else {
+         $mindate = 0;
+     }
     $roster_local_array = array();
-    $sql = "SELECT p.nickname, updated_at FROM ".$db->prefix."col_players p, (SELECT max( all_battles ) AS maxb, nickname FROM ".$db->prefix."col_players GROUP BY nickname) m WHERE p.all_battles = m.maxb AND p.nickname = m.nickname GROUP BY p.nickname";
+    $sql = "SELECT p.nickname, updated_at FROM ".$db->prefix."col_players p, (SELECT MAX(all_battles) AS maxb, nickname FROM ".$db->prefix."col_players GROUP BY nickname) m WHERE p.all_battles = m.maxb AND p.nickname = m.nickname GROUP BY p.nickname";
     $q = $db->prepare($sql);
     if ($q->execute() == TRUE) {
         foreach($q->fetchAll() as $val){
             $roster_local_array[$val['nickname']] = (int) $val['updated_at'];
         }
-    } else {
-        die(show_message($q->errorInfo(),__line__,__file__,$sql));
     }
 ?>
 <div align="center">
@@ -93,7 +98,10 @@
                                  <?php echo date('Y.m.d (H:i)',$roster_local_num);
                               } else {echo $roster_local_num;}; ?></td>
                     <td><?php
-                        if ($diff_date != 0) printf('%02d д.', $diff_date);
+                        if ($diff_date != 0) {
+                            if ($roster_local_array[$val['account_name']] == $mindate) echo '≥ ';
+                            echo $diff_date;
+                        }
                     ?></td>
                 </tr>
                 <?php } ?>
