@@ -255,6 +255,17 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
     if($log == 1) fwrite($fh, mydate().": (Err) Cron started too early. Time limit excided"."\n");
     echo 'Cron started too early!';
 }
+
+//Delete old data in the database
+include_once(ROOT_DIR.'/admin/func_admin.php');
+$olderdate=50;
+if($log == 1) fwrite($fh, mydate().": Delete data over ".$olderdate." days in the database\n");
+clean_db_old_cron($olderdate);
+if($log == 1){
+    fwrite($fh, mydate().": End delete\n");
+    fwrite($fh, mydate()."////////////////////////////////////////////--->\n\n");
+}
+
 //write some data for debug
 if ($log == 1){
     $end_time = microtime(true);
