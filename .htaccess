@@ -1,23 +1,21 @@
+AddDefaultCharset utf-8
+Options -Indexes
+DirectoryIndex index.php
+
+php_value date.timezone Europe/Moscow
+
 ErrorDocument 404 /_err/404.php
+ErrorDocument 403 /index.php
 
 RewriteEngine on
+
+#RewriteRule ^\w+$ /offline.php [L]
+#DirectoryIndex offline.php
 
 #Set default T1NCO
 #RewriteRule ^$ /t1nco
 
-RewriteRule ^admin/? - [L]
-RewriteRule ^ppp/? - [L]
-
-RewriteRule ^(\w+).html$ /main.php?multi=$1 [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(\w+)/$ /$1 [R=301]
 RewriteRule ^(\w+)$ /index.php?multi=$1 [L]
-
-php_value date.timezone Europe/Moscow
-
-#AddDefaultCharset utf-8
-Options -Indexes
-DirectoryIndex index.php main.php
-Options All
-
-#RewriteRule ^\w+$ /offline.php [L]
-#DirectoryIndex offline.php
