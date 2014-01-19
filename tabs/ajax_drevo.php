@@ -49,7 +49,7 @@
 </script>
 <?php 
 	foreach ($res as $name => $val) {
-		$arrnames[$name] = $name;
+		$arrnames[$name] = strtoupper($name);
 	};
 	asort($arrnames);
 
@@ -59,8 +59,8 @@
     <br />
     <?=$lang['name'];?>
     <select id="b_player1" onchange="smtmagic();">
-            <?php foreach($arrnames as $name){ ?>
-            <option value="<?=$name;?>"><?=$name;?></option>
+            <?php foreach($arrnames as $key2 => $name){ ?>
+            <option value="<?=$key2;?>"><?=$key2;?></option>
             <?php } ?>
     </select>
         <a href="#tabs-<?php echo $key; ?>" id="b_show_activity1"><?=$lang['select_show'];?></a>
