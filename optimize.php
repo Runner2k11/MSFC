@@ -6,6 +6,12 @@
         define('ROOT_DIR', '.');
     }
 
+$handle = fopen(ROOT_DIR . "/optimize.log", "a");
+if($handle) {
+    fwrite($handle, "Optimize started at " . date('Y-m-d H:i:s') . "\n");
+    fclose($handle);
+}
+
     include_once('function/mysql.php');
 
 $db_host = $dbhost; 
@@ -30,7 +36,7 @@ while($row = mysql_fetch_row($r))
 $q = substr($q,0,strlen($q)-1);
 mysql_query($q);
 
-print "База данных заблокированна для чтения/записи.<br>\n";
+print "Р‘Р°Р·Р° РґР°РЅРЅС‹С… Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРЅР° РґР»СЏ С‡С‚РµРЅРёСЏ/Р·Р°РїРёСЃРё.<br>\n";
 
 foreach($table as $value)
 {
@@ -59,7 +65,7 @@ foreach($table as $value)
   mysql_query($q) or die("QUERY: \"$q\" " . mysql_error() . "\n\n");
 }
 mysql_query("UNLOCK TABLES");
-print "База данных разблокированна.<br>\n";
+print "Р‘Р°Р·Р° РґР°РЅРЅС‹С… СЂР°Р·Р±Р»РѕРєРёСЂРѕРІР°РЅРЅР°.<br>\n";
 ?>
 
 

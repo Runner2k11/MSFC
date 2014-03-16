@@ -22,7 +22,7 @@ ini_set("display_errors", 1);
 if (file_exists(dirname(__FILE__).'/function/mysql.php')) {
     define('ROOT_DIR', dirname(__FILE__));
 }else{
-    define('ROOT_DIR', '.');    
+    define('ROOT_DIR', '.');
 }
 //Starting script time execution timer
 $begin_time = microtime(true);
@@ -33,7 +33,7 @@ if(!isset($_GET['user']) && !isset($_GET['pass'])){
 }else{
     $user = $_GET['user'];
     $pass = $_GET['pass'];
-}                                          
+}
 
 //Checker
 include_once(ROOT_DIR.'/including/check.php');
@@ -182,7 +182,6 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
                             if ($plc > 0){
                                if ($log == 1) fwrite($fh, mydate().": (WG) Try to load info on ".$plc." players"."\n");
                             }
-                                    if($log == 1) fwrite($fh, mydate().": (WG) Try to load info on ".$plc." players"."\n");
                             $toload = array_chunk($toload,$config['multiget']*5); 
                             $res1 = $res2 = $res3 = array();
                             foreach($toload as $links){
@@ -259,24 +258,21 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
 //Delete old data in the database
 include_once(ROOT_DIR.'/admin/func_admin.php');
 $olderdate=50;
-if($log == 1) fwrite($fh, mydate().": Delete data over ".$olderdate." days in the database\n");
+if($log == 1) fwrite($fh, mydate().": (Info) Delete data over ".$olderdate." days in the database\n");
 clean_db_old_cron($olderdate);
-if($log == 1){
-    fwrite($fh, mydate().": End delete\n");
-    fwrite($fh, mydate()."////////////////////////////////////////////--->\n\n");
-}
+if($log == 1) fwrite($fh, mydate().": (Info) End delete\n");
 
 //write some data for debug
 if ($log == 1){
     $end_time = microtime(true);
     if (isset($toload)) {
-        fwrite($fh, mydate().": (Info) ".count($toload)." players processed in ".(round($end_time - $begin_time,4).' '.$lang['sec'])."\n");
+        fwrite($fh, mydate().": (Info) ".($plc-1)." players processed in ".(round($end_time - $begin_time,4).' '.$lang['sec'])."\n");
     }   else {
         fwrite($fh, mydate().": (Info) Cron finished  in ".(round($end_time - $begin_time,4).' '.$lang['sec'])."\n");
     }
     if(is_numeric($db->count)) {
         fwrite($fh, mydate().": (Info) Number of MySQL queries - ".($db->count)."\n");
     }
-    fwrite($fh, mydate().": (Info) End cron job\n");
+    fwrite($fh, mydate().": (Info) End cron job\n\n");
 }
 ?>
