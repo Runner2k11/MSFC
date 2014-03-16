@@ -126,32 +126,48 @@ if ($count['all'] == 0 and $count['clan'] == 0 and $count['company'] == 0) {
         $( "#triggeractivity" ).buttonset();
         $(".clan").hide();
         $(".company").hide();
+        $(".cc").hide();
         $("#change_all").click(function() {
           $(".clan").hide();
           $(".company").hide();
           $(".all").show();
+          $(".cc").hide();
           return false;
         });
         $("#change_clan").click(function() {
           $(".all").hide();
           $(".company").hide();
           $(".clan").show();
+          $(".cc").hide();
           return false;
         });
         $("#change_company").click(function() {
           $(".all").hide();
           $(".clan").hide();
           $(".company").show();
+          $(".cc").hide();
           return false;
+        });
+        $("#change_cc").click(function() {
+          $(".all").hide();
+          $(".clan").hide();
+          $(".company").hide();
+          $(".cc").show();
+          return false;
+
         });
     });
 </script>
+<div><style type="text/css">
+.cc {text-align: center;min-width: 30px;}
+</style></div>
 <div align="center">
   <form>
     <div id="triggeractivity" align="center">
         <input type="radio" id="change_all" name="triggerrating" checked="checked" /><label for="change_all"><?=$lang['a_cat_1'];?></label>
         <input type="radio" id="change_clan" name="triggerrating" /><label for="change_clan"><?=$lang['a_cat_2'];?></label>
         <input type="radio" id="change_company" name="triggerrating" /><label for="change_company"><?=$lang['a_cat_3'];?></label>
+        <input type="radio" id="change_cc" name="triggerrating" /><label for="change_cc">ГК + Рота</label>
     </div>
   </form>
 </div>
@@ -165,7 +181,13 @@ if ($count['all'] == 0 and $count['clan'] == 0 and $count['company'] == 0) {
                         echo '<th class="'.$colname.'">',date('d.m.Y',$i),'</th>';
                      }
                      echo '<th class="'.$colname.'">',$lang['activity_4'],'</th>';
-                  } ?>
+                  }
+
+                     for($i=$time['from'];$i<=$time['to'];$i+=86400) {
+                        echo '<th class="cc">',date('d.m.Y',$i),'</th>';
+                     }
+                     echo '<th class="cc">',$lang['activity_4'],'</th>';
+                  ?>
         </tr>
     </thead>
     <tbody>
@@ -183,7 +205,18 @@ if ($count['all'] == 0 and $count['clan'] == 0 and $count['company'] == 0) {
                              }
                          }
                          echo '<td class="'.$colname.'">',$count,'</td>';
-                      }?>
+                      }
+                         $count = 0;
+                         for($i=$time['from'];$i<=$time['to'];$i+=86400) {
+                             if ((isset($activity[date('d.m.Y',$i)][$name]['clan_battles']) && $activity[date('d.m.Y',$i)][$name]['clan_battles'] <> 0) || (isset($activity[date('d.m.Y',$i)][$name]['company_battles']) && $activity[date('d.m.Y',$i)][$name]['company_battles'] <> 0)) {
+                                 echo '<td class="cc">',$activity[date('d.m.Y',$i)][$name]['clan_battles'] + $activity[date('d.m.Y',$i)][$name]['company_battles'],'</td>';
+                                 $count += $activity[date('d.m.Y',$i)][$name]['clan_battles'] +  $activity[date('d.m.Y',$i)][$name]['company_battles'];
+                             }   else {
+                                 echo '<td class="cc"></td>';
+                             }
+                         }
+                         echo '<td class="cc">',$count,'</td>';
+?>
             </tr>
             <?php } ?>
     </tbody>
