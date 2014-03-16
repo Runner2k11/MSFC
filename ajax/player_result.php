@@ -652,8 +652,8 @@ if (count($b_player_all) >1) {
 
       <tr>
         <td><span class="hidden"><?=$val['level'];?></span>
-            <?php if (strlen($val['name_i18n']) > 20) {
-                      $trimmed = substr($val['name_i18n'], 0, 18 );
+            <?php if (strlen($val['name_i18n']) > 40) {
+                      $trimmed = substr($val['name_i18n'], 0, 38 );
                       echo $trimmed.'...';
                   }   else {
                       echo $val['name_i18n'];
