@@ -25,6 +25,6 @@
 ?>
 
 <div align="center">
-<iframe name="111" height=800 width="100%" src="http://armor.kiev.ua/wot/gamertrees/<?=$b_player?>"></iframe></br>
+<iframe frameborder="no" height="720" width="100%" src="ajax/drevopre.php?b_player=<?=$b_player?>"></iframe></br>
 Данные взяты с сайта <a href="http://armor.kiev.ua" target="_blank">armor.kiev.ua</a>
 </div>
