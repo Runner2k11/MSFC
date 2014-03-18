@@ -192,11 +192,6 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
         </tbody>
     </table>
 <center><br>
-    <a href="javascript:;" onclick="window.open('./counter/stat.php','stat','height=180,width=300').focus()" title="Статистика посещений">
-    <script language="JavaScript"><!--
-      document.write('<img src="./counter/counter2.php?rand='+Math.random()+'">');
-    //--></script></a><br>
-
     &nbsp;<img width='88' height='31' border='0' alt='uptime' src="http://ext.host-tracker.com/uptime-img/?s=31&amp;t=12120310&amp;m=00.09&amp;p=Total&amp;src=lvuc" />&nbsp;
     <!--LiveInternet logo--><a href="http://www.liveinternet.ru/click"
     target="_blank"><img src="//counter.yadro.ru/logo?22.6"
