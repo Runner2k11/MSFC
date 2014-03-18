@@ -64,7 +64,7 @@
 <table style="border-width: 0; " cellpadding="0" cellspacing="0" width="450px" class="ui-widget-content">
     <tbody>
         <tr>
-            <td>Последние новости в "Мире Танков"</td>
+            <td>Последние новости в <a target="_blank" href="http://wot-news.com/">"Мире Танков"</a></td>
         </tr>
         <tr>
             <td>
