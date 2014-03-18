@@ -20,36 +20,44 @@
     ini_set("display_errors", 1);
     if (file_exists(dirname(__FILE__).'/func_ajax.php')) {
         define('LOCAL_DIR', dirname(__FILE__));
-        include_once (LOCAL_DIR.'/func_ajax.php');
-
+        require(LOCAL_DIR.'/func_ajax.php');
         define('ROOT_DIR', base_dir('ajax'));
 
     }else{
         define('LOCAL_DIR', '.');
-        include_once (LOCAL_DIR.'/func_ajax.php');
-
         define('ROOT_DIR', '..');
 
     }
-    include_once(ROOT_DIR.'/including/check.php');
-    include_once(ROOT_DIR.'/function/auth.php');
-    include_once(ROOT_DIR.'/function/mysql.php');
+    include(ROOT_DIR.'/including/check.php');
+    require(ROOT_DIR.'/function/auth.php');
+    include(ROOT_DIR.'/function/mysql.php');
     $db->change_prefix($_POST['db_pref']);
-    include_once(ROOT_DIR.'/function/func.php');
-    include_once(ROOT_DIR.'/function/func_main.php');
-    include_once(ROOT_DIR.'/function/config.php');
-    include_once(ROOT_DIR.'/config/config_'.$config['server'].'.php');                      
+    require(ROOT_DIR.'/function/func.php');
+    require(ROOT_DIR.'/function/func_main.php');
+    include(ROOT_DIR.'/function/config.php');
+    require(ROOT_DIR.'/config/config_'.$config['server'].'.php');
 
     foreach(scandir(ROOT_DIR.'/translate/') as $files){
         if (preg_match ("/_".$config['lang'].".php/", $files)){
-            include_once(ROOT_DIR.'/translate/'.$files);
+            require(ROOT_DIR.'/translate/'.$files);
         }
     } 
-    include_once(ROOT_DIR.'/function/cache.php');
+    require(ROOT_DIR.'/function/cache.php');
 
     //cache
     $cache = new Cache(ROOT_DIR.'/cache/');
     $new_roster = $cache->get('get_last_roster_'.$config['clan'],0);
+
+    if($config['company'] == 1 ) {
+      $company = $cache->get('company_'.$config['clan'],0,ROOT_DIR.'/cache/other/');
+      if(!isset($company['in_company'])) {
+        $company['in_company'] = array();
+      }
+      if(!isset($company['tabs'])) {
+        $company['tabs'] = array();
+      }
+    }
+
     //print_r($new_roster);
     foreach($new_roster['data'][$config['clan']]['members'] as $val){
         $res[$val['account_name']] = $cache->get($val['account_id'],0,ROOT_DIR.'/cache/players/');
@@ -85,7 +93,11 @@
 <table id="tankslist" width="100%" cellspacing="1" class="table-id-<?=$_POST['key'];?>">
     <thead>
         <tr>
-            <th><?=$lang['name']; ?></th><?php 
+            <th><?=$lang['name']; ?></th>
+            <? if($config['company'] == 1 and in_array($_POST['key'],$company['tabs'])) { ?>
+                <th><?=$lang['company']; ?></th>
+            <? } ?>
+            <?php
             foreach ($tanks as $key => $val) {
                echo '<th>',$val['name_i18n'],'</th>';
             } ?>
@@ -94,7 +106,11 @@
     <tbody>
         <?php foreach($res as $name => $val){ ?>
             <tr>
-                <td><a href="<?php echo $config['base'].$name.'/'; ?>" target="_blank"><?=$name; ?></a></td><?php
+                <td><a href="<?php echo $config['base'].$name.'/'; ?>" target="_blank"><?=$name; ?></a></td>
+                <? if($config['company'] == 1 and in_array($_POST['key'],$company['tabs'])) { ?>
+                    <td><?=in_array($val['data']['account_id'],$company['in_company'])?$company['company_names'][$company['by_id'][$val['data']['account_id']]]:'';?></td>
+                <? } ?>
+                <?php
                 foreach ($tanks as $key => $stat) {
                    echo '<td>';
                    $present = 0;

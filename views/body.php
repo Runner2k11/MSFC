@@ -156,7 +156,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
                                         if(!is_array($file)){?>
                                         <div id="tabs-<?=$key; ?>">
                                             <a href="#tabs-<?=$key; ?>"></a>
-                                            <?php include_once(ROOT_DIR.'/tabs/'.$file); ?>
+                                            <?php include(ROOT_DIR.'/tabs/'.$file); ?>
                                         </div>
                                         <?php  }else{ ?>
                                         <div id="tabs-<?=$key; ?>">

@@ -46,8 +46,16 @@
     <script type="text/javascript">
         $("#allcontainer").css({'height': $(window).height(), 'width': $(window).width(), 'overflow-x': 'hidden', 'overflow-y': 'hidden' });
         $(document).ready(function() {
-              $("#perform_all_n").tablesorter({sortList:[[0,0]], widgets: ['uitheme','stickyheaders','zebra'] });
-              $("#roster").tablesorter({sortList:[[5,0],[4,1],[1,0]], headers:{ 0: { sorter: false}}});
+              <?php
+              $roster_tab_id = 'unset';
+              foreach($current_tab as $t => $val) { if($val['file'] == 'roster.php') { $roster_tab_id = $val['id']; break; } }
+              if($config['company'] == 1 and in_array($roster_tab_id,$company['tabs'])) {
+               $roster_sortlist = '[6,0],[5,1],[1,0]';
+              } else {
+               $roster_sortlist = '[5,0],[4,1],[1,0]';
+              }
+              ?>
+              $("#roster").tablesorter({sortList:[<?=$roster_sortlist;?>], headers:{ 0: { sorter: false}}});
 
               $("#best_main")
               .add("#best_medal")
@@ -130,7 +138,7 @@
                       $('.pstat').css({'top': '100px'});
                     },
                     beforeClose: function( event, ui ) {
-                      $("#roster").tablesorter({sortList:[[5,0],[4,1],[1,0]], headers:{ 0: { sorter: false}}});
+                      $("#roster").tablesorter({sortList:[<?=$roster_sortlist;?>], headers:{ 0: { sorter: false}}});
                       $("#allcontainer").css({'min-height': '100%'});
                     }
               });

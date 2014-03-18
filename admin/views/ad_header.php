@@ -86,7 +86,42 @@
                            $('#<?=$key; ?>php').val('<?=$val2; ?>');
                         <?php };?>
                      });
-                  <?php };?>
+            <?php };?>
+            <? if($config['company'] == 1 ) { ?>
+              $( "ul.droptrue" ).sortable({
+                  connectWith: "ul",
+                  cursor: "move",
+                  appendTo: ".pl_list",
+                  dropOnEmpty: true,
+                  receive: function(e, ui) {
+                      var receiver = ui.item.closest('ul').attr('id');
+                      $('#'+receiver+' li').sort(function(a, b){
+                         return $(a).text().toLowerCase() > $(b).text().toLowerCase();
+                      }).appendTo('ul#'+receiver);
+                  },
+                  create: function( event, ui ) {
+                      $('#sortable0 li').sort(function(a, b){
+                         return $(a).text().toLowerCase() > $(b).text().toLowerCase();
+                      }).appendTo('ul#sortable0');
+                  }
+              });
+              $( ".droptrue" ).disableSelection();
+              $('#company_button').button().click( function() {
+                  $.ajax({
+                      cache: true,
+                      type: "POST",
+                      data: {
+                          company : <?=$config['company_count']; ?>,
+                          id : <?=$config['clan']; ?>,
+                          <?php  for($index=1;$index<=$config['company_count'];$index++) { ?>
+                              sort<?=$index;?> : $('#sortable<?=$index;?>').sortable('serialize'),
+                          <?php } ?>
+                      },
+                      url: "../ajax/ajax_company.php"
+                  });
+                  return false;
+              });
+            <? } ?>
         });
         function magic(elem){
             $(".ui-menu-item").each(function(){
@@ -100,6 +135,9 @@
         };
         function magic3(){
           $(".admin_cdhide").toggle();
+        };
+        function magic4(){
+          $(".admin_cdhide2").toggle();
         };
     </script>
     <?php if(isset($current_user)){ ?>
@@ -115,6 +153,9 @@
               <?php } ?>
         <?php if($config['cron'] == '0'){ ?>
           $(".admin_cdhide").hide();
+        <?php } ?>
+        <?php if($config['company'] == '0'){ ?>
+          $(".admin_cdhide2").hide();
         <?php } ?>
             });
       </script>

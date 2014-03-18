@@ -54,7 +54,17 @@ function insert_config($config)
             $config['cron_auth'] = 0;
         }
     }      
-    unset($config['consub'],$config['consub_2']);
+    if(isset($config['consub_3'])){
+        if(!isset($config['company'])){
+          $config['company'] = 0;
+        } else {
+          $config['company'] = 1;
+        }
+        if(!is_numeric($config['company_count']) or $config['company_count'] < 1) {
+          $config['company_count'] = 1;
+        }
+    }
+    unset($config['consub'],$config['consub_2'],$config['consub_3']);
     foreach($config as $name => $var){
         $sql = "UPDATE `config` SET value = '".$var."' WHERE name = '".$name."';";
         $q = $db->prepare($sql);
@@ -182,34 +192,37 @@ function delete_multi($get){
                     die(show_message($q->errorInfo(),__line__,__file__,$sql));
                 }
                 //print_r($status_clan);
-                $sql = "SHOW TABLES LIKE '".$status_clan['0']['prefix']."%';";
-                echo $sql;
-                $q = $db->prepare($sql);
-                if ($q->execute() == TRUE) {
-                    $list = $q->fetchAll(PDO :: FETCH_ASSOC);
-                }else{
-                    die(show_message($q->errorInfo(),__line__,__file__,$sql));
-                }
-                //print_r($list);
-                foreach($list as $val){
-                    foreach($val as $v){
-                        $sql = "DROP TABLE IF EXISTS ".$v.";";
-                        //echo $sql;
-                        $q = $db->prepare($sql);
-                        if ($q->execute() != TRUE) {
-                            die(show_message($q->errorInfo(),__line__,__file__,$sql));
-                        }
-                    }
-                }
-                if(!empty($status_clan)){
-
-                    $sql = "DELETE FROM multiclan WHERE id = '".$get['clan']."';";
+                if(isset($status_clan['0']['prefix']) and !empty($status_clan))
+                {
+                    $sql = "SHOW TABLES LIKE '".$status_clan['0']['prefix']."%';";
+                    echo $sql;
                     $q = $db->prepare($sql);
-                    if ($q->execute() != TRUE) {
+                    if ($q->execute() == TRUE) {
+                        $list = $q->fetchAll(PDO :: FETCH_ASSOC);
+                    }else{
                         die(show_message($q->errorInfo(),__line__,__file__,$sql));
                     }
+                    //print_r($list);
+                    if(!empty($list)) {
+                      foreach($list as $val){
+                          foreach($val as $v){
+                              $sql = "DROP TABLE IF EXISTS ".$v.";";
+                              //echo $sql;
+                              $q = $db->prepare($sql);
+                              if ($q->execute() != TRUE) {
+                                  die(show_message($q->errorInfo(),__line__,__file__,$sql));
+                              }
+                          }
+                      }
+
+                      $sql = "DELETE FROM multiclan WHERE id = '".$get['clan']."';";
+                      $q = $db->prepare($sql);
+                      if ($q->execute() != TRUE) {
+                          die(show_message($q->errorInfo(),__line__,__file__,$sql));
+                      }
+                    }
+                    $cache->clear('get_last_roster_'.$get['clan']);
                 }
-                $cache->clear('get_last_roster_'.$get['clan']);
             }
         }
     }
@@ -754,5 +767,37 @@ function clean_db_old_cron($date) {
           }
         }
     }
+}
+function utf8_substr($str, $offset, $length = null)
+{
+    #в начале пробуем найти стандартные функции
+    if (function_exists('iconv_substr'))
+    {
+        #(PHP 5)
+        return iconv_substr($str, $offset, $length, 'utf-8');
+    }
+    if (function_exists('mb_substr'))
+    {
+        #(PHP 4 >= 4.0.6, PHP 5)
+        return mb_substr($str, $offset, $length, 'utf-8');
+    }
+    preg_match_all('~[\x09\x0A\x0D\x20-\x7E]             # ASCII
+                     | [\xC2-\xDF][\x80-\xBF]            # non-overlong 2-byte
+                     |  \xE0[\xA0-\xBF][\x80-\xBF]       # excluding overlongs
+                     | [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} # straight 3-byte
+                     |  \xED[\x80-\x9F][\x80-\xBF]       # excluding surrogates
+                     |  \xF0[\x90-\xBF][\x80-\xBF]{2}    # planes 1-3
+                     | [\xF1-\xF3][\x80-\xBF]{3}         # planes 4-15
+                     |  \xF4[\x80-\x8F][\x80-\xBF]{2}    # plane 16
+                    ~xs', $str, $m);
+    if ($length !== null)
+    {
+        $a = array_slice($m[0], $offset, $length);
+    }
+    else
+    {
+        $a = array_slice($m[0], $offset);
+    }
+    return implode('', $a);
 }
 ?>

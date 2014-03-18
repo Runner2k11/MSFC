@@ -20,38 +20,49 @@ error_reporting(E_ALL & ~E_STRICT);
 ini_set("display_errors", 1);
 if (file_exists(dirname(__FILE__).'/func_ajax.php')) {
     define('LOCAL_DIR', dirname(__FILE__));
-    include_once (LOCAL_DIR.'/func_ajax.php');
+    require(LOCAL_DIR.'/func_ajax.php');
     define('ROOT_DIR', base_dir('ajax'));
 }   else{
     define('LOCAL_DIR', '.');
-    include_once (LOCAL_DIR.'/func_ajax.php');
     define('ROOT_DIR', '..');
 }
-include_once(ROOT_DIR.'/including/check.php');
-include_once(ROOT_DIR.'/function/auth.php');
-include_once(ROOT_DIR.'/function/mysql.php');
+include(ROOT_DIR.'/including/check.php');
+require(ROOT_DIR.'/function/auth.php');
+include(ROOT_DIR.'/function/mysql.php');
 if (isset($_POST['db_pref'])) $db->change_prefix($_POST['db_pref']);
-include_once(ROOT_DIR.'/function/func.php');
-include_once(ROOT_DIR.'/function/func_main.php');
-include_once(ROOT_DIR.'/function/config.php');
-include_once(ROOT_DIR.'/config/config_'.$config['server'].'.php');
+require(ROOT_DIR.'/function/func.php');
+require(ROOT_DIR.'/function/func_main.php');
+include(ROOT_DIR.'/function/config.php');
+require(ROOT_DIR.'/config/config_'.$config['server'].'.php');
 
 foreach(scandir(ROOT_DIR.'/translate/') as $files){
     if (preg_match ("/_".$config['lang'].".php/", $files)){
-        include_once(ROOT_DIR.'/translate/'.$files);
+        require(ROOT_DIR.'/translate/'.$files);
     }
 }
-include_once(ROOT_DIR.'/function/cache.php');
+require(ROOT_DIR.'/function/cache.php');
 
 //cache
 $cache = new Cache(ROOT_DIR.'/cache/');
 $new = $cache->get('get_last_roster_'.$config['clan'],0);
 
+if($config['company'] == 1 ) {
+  $company = $cache->get('company_'.$config['clan'],0,ROOT_DIR.'/cache/other/');
+  if(!isset($company['in_company'])) {
+    $company['in_company'] = array();
+  }
+  if(!isset($company['tabs'])) {
+    $company['tabs'] = array();
+  }
+}
+
 if (empty($new['data'][$config['clan']]['members'])){
     $res = array();
+    $res_id = array();
 }   else {
     foreach($new['data'][$config['clan']]['members'] as $val) {
         $res[] = $val['account_name'];
+        $res_id[$val['account_name']] = $val['account_id'];
     }
 }
 
@@ -175,7 +186,9 @@ if ($count['all'] == 0 and $count['clan'] == 0 and $count['company'] == 0) {
     <thead>
         <tr>
             <th><?=$lang['name']; ?></th>
-
+            <? if($config['company'] == 1 and in_array($_POST['key'],$company['tabs'])) { ?>
+                <th><?=$lang['company']; ?></th>
+            <? } ?>
             <?php foreach ($showarr as $colname) {
                      for($i=$time['from'];$i<=$time['to'];$i+=86400) {
                         echo '<th class="'.$colname.'">',date('d.m.Y',$i),'</th>';
@@ -194,6 +207,9 @@ if ($count['all'] == 0 and $count['clan'] == 0 and $count['company'] == 0) {
         <?php foreach($res as $name){ ?>
             <tr>
                 <td><a href="<?php echo $config['base'].$name.'/'; ?>" target="_blank"><?=$name; ?></a></td>
+                <? if($config['company'] == 1 and in_array($_POST['key'],$company['tabs'])) { ?>
+                    <td><?=in_array($res_id[$name],$company['in_company'])?$company['company_names'][$company['by_id'][$res_id[$name]]]:'';?></td>
+                <? } ?>
                 <?php foreach ($showarr as $colname) {
                          $count = 0;
                          for($i=$time['from'];$i<=$time['to'];$i+=86400) {
