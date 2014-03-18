@@ -56,6 +56,7 @@
               }
               ?>
               $("#roster").tablesorter({sortList:[<?=$roster_sortlist;?>], headers:{ 0: { sorter: false}}});
+              $("#perform_all_n").tablesorter({sortList:[[0,0]], widgets: ['uitheme','stickyheaders','zebra'] });
 
               $("#best_main")
               .add("#best_medal")
