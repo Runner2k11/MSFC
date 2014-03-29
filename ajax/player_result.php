@@ -637,7 +637,8 @@ if (count($b_player_all) >1) {
       </tr>
       <tr>
         <th align="center" colspan="2">Кол-во</th>
-        <th align="center" colspan="2">%</th>
+        <th align="center">За период</th>
+        <th align="center">Общее</th>
         <th align="center" ><?=$lang['name'];?></th>
         <th align="center" >Дельта</th>
       </tr>
@@ -666,12 +667,13 @@ if (count($b_player_all) >1) {
         <td><?php if ($val['win_d']<>0) echo '+';
 
                   echo $val['win_d']; ?></td>
-        <td><?php echo round ($val['win']/$val['total']*100,2); ?>%</td>
-        <td><?php $shown = Round($val['win']/$val['total']*100 - ($val['win']- $val['win_d'])/($val['total'] - $val['total_d'])*100,2);
+        <td><?php echo round ($val['win_d']/$val['total_d']*100,2); ?>%</td>
+        <td><?php echo round ($val['win']/$val['total']*100,2); ?>%
+        (<?php $shown = Round($val['win']/$val['total']*100 - ($val['win']- $val['win_d'])/($val['total'] - $val['total_d'])*100,2);
                   if ($shown >  0) echo $darkgreen.'+'.$shown.'%'.$darkend;
                   if ($shown <  0) echo $darkred.$shown.'%'.$darkend;
                   if ($shown == 0) echo '0%';
-            ?></td>
+        ?>)</td>
 
         <td><img src="<?='http://'.$config['gm_url'].$marks[$val['mark_of_mastery']]; ?>" /></td>
         <td><?php $shown = $val['mark_of_mastery']-$val['mark_of_mastery_d'];
@@ -700,13 +702,14 @@ if (count($b_player_all) >1) {
         <td>+<?php echo $total_d_all; ?></td>
         <td></td>
         <td>+<?php echo $win_d_all; ?></td>
-        <td><?php echo Round($win_d_all/$total_d_all*100,2); ?>%</td>
-        <td><?php
+        <td><?php echo Round($win_d_all/$total_d_all*100,2); ?>%
+        (<?php
           $windiff = Round($win_d_all/$total_d_all*100 - $last['all_wins']/$last['all_battles']*100,2);
           if ($windiff >  0) echo $darkgreen.'+'.$windiff.'%'.$darkend;
           if ($windiff <  0) echo $darkred.$windiff.'%'.$darkend;
           if ($windiff == 0) echo '0%';
-        ?></td>
+        ?>)</td>
+        <td></td>
         <td colspan=2></td>
       </tr>
     </tfoot>
