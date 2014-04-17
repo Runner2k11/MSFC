@@ -11,7 +11,7 @@
 * @copyright   2011-2013 Edd - Aleksandr Ustinov
 * @link        http://wot-news.com
 * @package     Clan Stat
-* @version     $Rev: 3.0.2 $
+* @version     $Rev: 3.0.4 $
 *
 */
 
@@ -31,7 +31,7 @@ function cron_update_tanks_db() {
         $tanks[$val['tank_id']] = $val['tank_id'];
     }
     unset($sel);
-    $tmp = get_tank_v2($config);
+    $tmp = get_api('encyclopedia/tanks');
     if ((isset($tmp['status'])) && ($tmp['status'] == 'ok')) {
         $updatearr = $toload = array ();
         foreach ($tmp['data'] as $tank_id => $val) {
@@ -41,6 +41,11 @@ function cron_update_tanks_db() {
                 $updatearr [$tank_id]['nation_i18n'] = $val['nation_i18n'];
                 $updatearr [$tank_id]['level']       = $val['level'];
                 $updatearr [$tank_id]['nation']      = $val['nation'];
+                $updatearr [$tank_id]['name_i18n']   = $val['name_i18n'];
+
+                $pieces = explode(':', $val['name']);
+                $updatearr [$tank_id]['title']      = $pieces['1'];
+
                 if ($val['is_premium']== true) {
                     $updatearr [$val['tank_id']]['is_premium']      = 1;
                 }   else {
@@ -51,27 +56,20 @@ function cron_update_tanks_db() {
         }
         unset($tmp);
         if (!empty($toload)) {
-            $tmp = multiget_v2($toload, 'encyclopedia/tankinfo', $config, array ('contour_image', 'image', 'image_small', 'name_i18n'));
+            $tmp = multiget_v2($toload, 'encyclopedia/tankinfo', $config, array ('contour_image', 'image', 'image_small'));
             if ((isset($tmp['status'])) && ($tmp['status'] == 'ok')) {
                 foreach ($tmp as $tank_id => $val) {
-                    $updatearr [$tank_id]['name_i18n']     = $val['data']['name_i18n'];
                     $updatearr [$tank_id]['image']         = $val['data']['image'];
                     $updatearr [$tank_id]['contour_image'] = $val['data']['contour_image'];
                     $updatearr [$tank_id]['image_small']   = $val['data']['image_small'];
-                    if($tank_id == 52225){
-                        $updatearr [$tank_id]['name_i18n']     = 'БТ-СВ';
-                        $updatearr [$tank_id]['image']         = 'http://worldoftanks.ru/static/3.16.0.3.1/encyclopedia/tankopedia/vehicle/ussr-bt-sv.png';
-                        $updatearr [$tank_id]['contour_image'] = 'http://worldoftanks.ru/static/3.16.0.3.1/encyclopedia/tankopedia/vehicle/small/ussr-bt-sv.png';
-                        $updatearr [$tank_id]['image_small']   = 'http://worldoftanks.ru/static/3.16.0.3.1/encyclopedia/tankopedia/vehicle/contour/ussr-bt-sv.png';    
-                    }
                 }
             }   else {
                 die('Problem with getting tank info. Solution on http://wot-news.com/forum/viewtopic.php?f=30&t=20191&start=40#p48619');
             }
             unset($tmp);
-            $sql = "INSERT INTO `tanks` (`tank_id`, `nation_i18n`, `level`, `nation`, `is_premium`, `name_i18n`, `type`, `image`, `contour_image`, `image_small`) VALUES ";
+            $sql = "INSERT INTO `tanks` (`tank_id`, `nation_i18n`, `level`, `nation`, `is_premium`, `title`, `name_i18n`, `type`, `image`, `contour_image`, `image_small`) VALUES ";
             foreach ($updatearr as $tank_id => $val) {
-                $sql .= "('{$val['tank_id']}', '{$val['nation_i18n']}', '{$val['level']}', '{$val['nation']}', '{$val['is_premium']}', '{$val['name_i18n']}', '{$val['type']}', '{$val['image']}', '{$val['contour_image']}', '{$val['image_small']}'), ";
+                $sql .= "('{$val['tank_id']}', '{$val['nation_i18n']}', '{$val['level']}', '{$val['nation']}', '{$val['is_premium']}',  '{$val['title']}', '{$val['name_i18n']}', '{$val['type']}', '{$val['image']}', '{$val['contour_image']}', '{$val['image_small']}'), ";
             }
             $sql = substr($sql, 0, strlen($sql)-2);
             $sql .= ';';
@@ -99,9 +97,8 @@ function cron_insert_pars_data($data, $medals, $tanks, $nationsin, $time){
     $stats2 = array('spotted', 'hits', 'battle_avg_xp', 'draws', 'wins', 'losses', 'capture_points',
         'battles', 'damage_dealt', 'hits_percents', 'damage_received', 'shots', 'xp', 'frags',
         'survived_battles', 'dropped_capture_points');
-    $stats4 = array ('place', 'value');
-    $stats5 = array ('spotted', 'dropped_ctf_points', 'battle_avg_xp', 'battles', 'damage_dealt', 'frags',
-        'ctf_points', 'integrated_rating', 'xp', 'battle_avg_performance', 'battle_wins');
+    $stats4 = array ('rank', 'value');
+    $stats5 = array ('global_rating','battles_count','wins_ratio','survived_ratio','frags_count','damage_dealt','xp_avg','xp_max','hits_ratio');
      if ((isset($data['status'])) && ($data['status'] == 'ok')) {
         $data = $data['data'];
         $col_pl['account_id'] = $col_med['account_id'] = $col_rat['account_id'] = $data['account_id'];

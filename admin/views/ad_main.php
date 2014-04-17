@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.2 $
+    * @version     $Rev: 3.0.4 $
     *
     */
 ?>
@@ -172,6 +172,7 @@
                                   <option value="ru" <?php if($config['lang'] == 'ru'){ echo 'selected="selected"';} ?>>Русский</option>
                                   <option value="pl" <?php if($config['lang'] == 'pl'){ echo 'selected="selected"';} ?>>Polski</option>
                                   <option value="en" <?php if($config['lang'] == 'en'){ echo 'selected="selected"';} ?>>English</option>
+								  <option value="sk" <?php if($config['lang'] == 'sk'){ echo 'selected="selected"';} ?>>Slovenčina</option>
                               </select>
                            </div>
                         </div>
@@ -241,6 +242,12 @@
                                  $american_pm = $tz_current->format('H') > 12 ? ' ('. $tz_current->format('g:i a'). ')' : '';
                                  echo $lang['cur_timezone'].$tz_current->format('d.m.Y H:i:s').$american_pm;
                               ?>
+                           </div>
+                        </div>
+                        <div class="settingsLine">
+                           <div><?=$lang['dst'];?></div>
+                           <div>
+                              <input <?=($config['dst']=='1')?'checked="checked"':'';?> type="checkbox" name="dst" value="1" size="2" />
                            </div>
                         </div>
                         <?php if($config['lang'] == 'ru'){?>
@@ -776,7 +783,7 @@
                         <br /><h3><?=$lang['admin_company_add'];?></h3>
                         <form action="<?=$_SERVER['REQUEST_URI']?>#tabs-7" method="post">
                             <?php for($index=1;$index<=$config['company_count'];$index++){ ?>
-                                <?=$index;?> - <input type="text" value="<?=isset($adm_company['company_names'][$index])?$adm_company['company_names'][$index]:$index;?>" name="Array[title][<?=$index;?>]" style="width: 100px;"><br />
+                                <?=$index;?> - <input type="text" value="<?=isset($adm_company['company_names'][$index])?$adm_company['company_names'][$index]:'';?>" name="Array[title][<?=$index;?>]" style="width: 100px;"><br />
                             <?php } ?>
                             <p><input type="submit" value="<?=$lang['admin_submit']?>" name="company_names_update"></p>
                         </form>

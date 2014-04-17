@@ -11,7 +11,7 @@
 * @copyright   2011-2013 Edd - Aleksandr Ustinov
 * @link        http://wot-news.com
 * @package     Clan Stat
-* @version     $Rev: 3.0.2 $
+* @version     $Rev: 3.0.4 $
 *
 */
 
@@ -41,6 +41,9 @@ function insert_config($config)
     if(isset($config['consub'])){
         if(!isset($config['news'])){
             $config['news'] = 0;
+        }
+        if(!isset($config['dst'])){
+            $config['dst'] = 0;
         }
     }
     if(isset($config['consub_2'])){

@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.2 $
+    * @version     $Rev: 3.0.4 $
     *
     */
 
@@ -160,26 +160,6 @@ $temp[$nickname] = $pres;
 $eff_ratpl = eff_rating($temp);
 unset($temp);
 
-switch ($eff_ratpl[$nickname]['eff']+1) {
-  case ($eff_ratpl[$nickname]['eff'] > 1725):
-    $color = '#FF8000';
-    break;
-  case ($eff_ratpl[$nickname]['eff'] > 1465):
-    $color = 'purple';
-    break;
-  case ($eff_ratpl[$nickname]['eff'] > 1150):
-    $color = 'royalblue';
-    break;
-  case ($eff_ratpl[$nickname]['eff'] > 870):
-    $color = 'green';
-    break;
-  case ($eff_ratpl[$nickname]['eff'] > 645):
-    $color = 'slategray';
-    break;
-  default:
-    $color = 'red';
-    break;
-}
 switch ($eff_ratpl[$nickname]['brone']+1) {
   case ($eff_ratpl[$nickname]['brone'] > 7294):
     $textt = $lang['classVf'];$imgg='classVf.png';
@@ -213,7 +193,7 @@ switch ($eff_ratpl[$nickname]['brone']+1) {
 $statmain   = array('wins', 'losses', 'draws', 'survived_battles');
 $statbattle = array('spotted', 'frags', 'hits_percents', 'damage_dealt', 'damage_received', 'capture_points', 'dropped_capture_points');
 $statexp    = array('xp', 'battle_avg_xp');
-$statrat    = array('battles_count', 'wins_ratio', 'frags_count', 'damage_dealt', 'spotted_count', 'survived_ratio', 'xp_avg', 'xp_max', 'hits_ratio');
+$statrat    = array('global_rating','battles_count','wins_ratio','survived_ratio','frags_count','damage_dealt','xp_avg','xp_max','hits_ratio');
 
 $statacc = array('all', 'clan', 'company');
 foreach ($statacc as $val) {
@@ -261,7 +241,7 @@ foreach ($statacc as $val) {
          </thead>
          <tbody>
            <tr>
-             <td align="center"><font color="<?=$color; ?>"><?=$eff_ratpl[$nickname]['eff']; ?></font></td>
+             <td align="center"><font color="<?=$eff_ratpl[$nickname]['eff_color']; ?>"><?=$eff_ratpl[$nickname]['eff']; ?></font></td>
            </tr>
          </tbody>
        </table>

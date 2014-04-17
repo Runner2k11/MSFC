@@ -11,7 +11,7 @@
 * @copyright   2011-2013 Edd - Aleksandr Ustinov
 * @link        http://wot-news.com
 * @package     Clan Stat
-* @version     $Rev: 3.0.2 $
+* @version     $Rev: 3.0.4 $
 *
 */
 $col_tables = get_tables_like_col_tank($dbname);  
@@ -60,7 +60,10 @@ if ((isset($multiclan_info[$config['clan']]['status'])) && ($multiclan_info[$con
         if( ($tmp === FALSE) || (empty($tmp)) || ((isset($tmp['status'])) && ($tmp['status']<>'ok')) ) {
             $cache->clear($pldata['account_id'],ROOT_DIR.'/cache/players/');
             $links[] = $pldata['account_id'];
+        } else {
+          $res[$name] = $tmp;
         }
+        unset($tmp);
     }
     $links = array_chunk($links,$config['multiget']*5);
     unset($pldata,$tmp);
@@ -68,7 +71,7 @@ if ((isset($multiclan_info[$config['clan']]['status'])) && ($multiclan_info[$con
         foreach($links as $urls){
             $res_base['info'] = multiget_v2($urls, 'account/info', $config);
             $res_base['tanks'] = multiget_v2($urls, 'account/tanks', $config, array('mark_of_mastery', 'tank_id', 'statistics.battles', 'statistics.wins')); //loading only approved fields
-            $res_base['ratings'] = multiget_v2($urls, 'ratings/accounts', $config);
+            $res_base['ratings'] = multiget_v2($urls, 'ratings/accounts', $config, array(), array('type'=>'all'));
 
             foreach ($res_base['info'] as $key => $val) {
                 if ((isset ($val['status'])) && ($val['status'] == 'ok')) {
@@ -76,8 +79,9 @@ if ((isset($multiclan_info[$config['clan']]['status'])) && ($multiclan_info[$con
                           $val['data']['tanks'] = $res_base['tanks'][$key]['data'];
                           if (isset ($res_base['ratings'][$key]['data'])){
                               $val['data']['ratings'] = $res_base['ratings'][$key]['data'];
+                              $cache->set($key, $val, ROOT_DIR.'/cache/players/');
+                              $res[$val['data']['nickname']] = $val;
                           }
-                          $cache->set($key, $val, ROOT_DIR.'/cache/players/');
                      }    else {
                           $message = "Can't load data on ".$key." (tank info)";
                      }
@@ -89,15 +93,6 @@ if ((isset($multiclan_info[$config['clan']]['status'])) && ($multiclan_info[$con
         unset($links, $res_base);
 
     }
-    foreach($roster as $name => $pldata){
-        $tmp = $cache->get($pldata['account_id'], $config['cache']*3600+1, ROOT_DIR.'/cache/players/');
-        if( ($tmp === FALSE) || (empty($tmp)) || ((isset($tmp['status'])) && ($tmp['status']<>'ok')) ) {
-            $res[$name] = $pldata;
-        }    else {
-            $res[$name] = $tmp;
-        }
-    }
-    unset($tmp);
 }
 
 //Autocleaner
@@ -110,7 +105,22 @@ if (empty($tanks)) {
     $tanks = tanks();
 }
 
-$eff_rating = eff_rating($res);
+/* code for wn8 */
+$wn8 = $cache->get('wn8', 7*24*60*60, ROOT_DIR.'/cache/other/'); //once in 7 days
+if(($wn8 === FALSE) or !isset($wn8['data']) or empty($wn8['data'])) {
+  $wn8_get = get_wn8();
+  if(isset($wn8_get['header']['version']) and isset($wn8_get['data'])) {
+    $wn8 = array_resort($wn8_get['data'],'IDNum');
+    $cache->clear('wn8',ROOT_DIR.'/cache/other/');
+    $cache->set('wn8', $wn8, ROOT_DIR.'/cache/other/');
+  } else {
+    $wn8 = array();
+  }
+  unset($wn8_get);
+}
+/* end wn8 */
+
+$eff_rating = eff_rating($res,$wn8);
 $tanks_nation = tanks_nations();
 $tanks_types = tanks_types();
 $tanks_lvl = tanks_lvl();
@@ -126,5 +136,12 @@ if($config['company'] == 1 ) {
   if(!isset($company['tabs'])) {
     $company['tabs'] = array();
   }
+  if(!isset($company['company_names']) or empty($company['company_names'])) {
+    for($i=1;$i<=$config['company_count'];$i++) {
+      $company['company_names'][$i] = $i;
+    }
+  }
 }
+
+
 ?>

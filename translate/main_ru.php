@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.2 $
+    * @version     $Rev: 3.0.4 $
     *
     */
 
@@ -36,16 +36,6 @@
     $lang['max_xp'] = 'Максимальный опыт за бой';
     $lang['page_title'] = 'Список клана';
     $lang['winp'] = 'Побед %';
-
-    $lang['r_battles_count'] = 'Проведено боёв';
-    $lang['r_wins_ratio'] = 'Процент побед';
-    $lang['r_frags_count'] = 'Уничтожено врагов';
-    $lang['r_damage_dealt'] = 'Нанесенные повреждения';
-    $lang['r_spotted_count'] = 'Обнаружено врагов';
-    $lang['r_survived_ratio'] = 'Выжил в битвах';
-    $lang['r_xp_max'] = 'Максимальный опыт';
-    $lang['r_xp_avg'] = 'Средний опыт';
-    $lang['r_hits_ratio'] = 'Процент попадания';
 
     $lang['gr_p'] = 'Позиция в рейтинге общий рейтинг';
     $lang['wb_p'] = 'Позиция в рейтинге процент побед';
@@ -110,11 +100,6 @@
     $lang['mspo'] = 'Средний засвет';
     $lang['mcap'] = 'Средняя захват';
     $lang['mdef'] = 'Средняя защита';
-    $lang['eff_ret'] = 'Рейтинг Эффективности';
-    $lang['wn6_ret'] = 'WN6 рейтинг';
-    $lang['brone_ret'] = 'Рейтинг Бронесайта';
-    $lang['xvm_eff_ret'] = 'XVM Рейтинг Эффективности';
-    $lang['xvm_wn6_ret'] = 'XVM WN6 рейтинг';
     $lang['average_perform_title'] = 'Средняя производительность';
     $lang['gk_blocked'] = 'Заблокированная техника';
     $lang['version'] = 'версия';

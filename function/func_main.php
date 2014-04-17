@@ -11,7 +11,7 @@
 * @copyright   2011-2013 Edd - Aleksandr Ustinov
 * @link        http://wot-news.com
 * @package     Clan Stat
-* @version     $Rev: 3.0.2 $
+* @version     $Rev: 3.0.4 $
 *
 */
 
@@ -192,8 +192,8 @@ function check_tables($medals, $nations, $tanks) {
     }   else {
         die(show_message($q->errorInfo(),__line__,__file__,$sql));
     }
+
     if (count($tmp)==0) {
-        $tsql = '';
         $sql = "CREATE TABLE IF NOT EXISTS `col_medals` (
         `account_id` INT(12),
         `updated_at` INT( 12 ) NOT NULL,
@@ -202,21 +202,35 @@ function check_tables($medals, $nations, $tanks) {
         if ($q->execute() !== TRUE) {
             die(show_message($q->errorInfo(),__line__,__file__,$sql));
         }
-        foreach ($medals as $key => $val) {
-            $tmp2 = substr($key, 0, 6);
-
-            if ($tmp2 == 'mechan' || $tmp2 == 'tank_e') {
-                $size = 'tinyint(1)';
-            }   else {
-                $size = 'smallint(12)';
-            }
-            $tsql .= "ALTER TABLE `col_medals` ADD `".$key."` ".$size." UNSIGNED NOT NULL DEFAULT 0;";
-        }
-        if ($tsql != '') {
-            $q = $db->prepare($tsql);
-            if ($q->execute() !== TRUE) { die(show_message($q->errorInfo(),__line__,__file__,$tsql)); }
-        }
     }
+
+    //Получаем структуру таблицы
+    $sql = "SHOW COLUMNS FROM `col_medals` ;";
+    $q = $db->prepare($sql);
+    if ($q->execute() != TRUE) {
+        die(show_message($q->errorInfo(),__line__,__file__,$sql));
+    }
+
+    $medals_structure = array_fill_keys($q->fetchAll(PDO::FETCH_COLUMN), 1);
+    $tsql = '';
+
+    foreach ($medals as $key => $val) {
+      if(!isset($medals_structure[$key])) {
+        $tmp2 = substr($key, 0, 6);
+
+        if ($tmp2 == 'mechan' || $tmp2 == 'tank_e') {
+            $size = 'tinyint(1)';
+        }   else {
+            $size = 'smallint(12)';
+        }
+        $tsql .= "ALTER TABLE `col_medals` ADD `".$key."` ".$size." UNSIGNED NOT NULL DEFAULT 0;";
+      }
+    }
+    if ($tsql != '') {
+        $q = $db->prepare($tsql);
+        if ($q->execute() !== TRUE) { die(show_message($q->errorInfo(),__line__,__file__,$tsql)); }
+    }
+
     foreach ($tanks as $tank_id => $val3) {
         $ntanks[$val3['nation']][$tank_id] = $tank_id;
     }
@@ -230,7 +244,6 @@ function check_tables($medals, $nations, $tanks) {
         }   else {
             die(show_message($q->errorInfo(),__line__,__file__,$sql));
         }
-        $sqlarr = array();
         if (count($tmp)==0) {
             $sql = "CREATE TABLE IF NOT EXISTS `col_tank_".$val."` (
             `account_id` INT(12),
@@ -240,7 +253,7 @@ function check_tables($medals, $nations, $tanks) {
             if ($q->execute() !== TRUE) {
                 die(show_message($q->errorInfo(),__line__,__file__,$sql));
             }
-
+            $sqlarr = array();
             foreach ($ntanks[$val] as $tank_id => $val4 ) {
                 $sqlarr[] = "ALTER TABLE `col_tank_".$val."`
                 ADD `".$tank_id."_battles` smallint(12) UNSIGNED NOT NULL DEFAULT 0,
@@ -253,29 +266,29 @@ function check_tables($medals, $nations, $tanks) {
                     if ($q->execute() !== TRUE) { die(show_message($q->errorInfo(),__line__,__file__,$tsql)); }
                 }
             }
-        }   else {
-            $sql = "select * from `col_tank_".$val."` LIMIT 0 , 1;";
-            $q = $db->prepare($sql);
-            if ($q->execute() == TRUE) {
-                $sel = $q->fetchAll();
-            }   else {
-                die(show_message($q->errorInfo(),__line__,__file__,$sql));
+        }
+
+        $sqlarr = $tanks_structure = array();
+        //Получаем структуру таблицы
+        $sql = "SHOW COLUMNS FROM `col_tank_".$val."`;";
+        $q = $db->prepare($sql);
+        if ($q->execute() != TRUE) {
+            die(show_message($q->errorInfo(),__line__,__file__,$sql));
+        }
+
+        $tanks_structure = array_fill_keys($q->fetchAll(PDO::FETCH_COLUMN), 1);
+        foreach ($ntanks[$val] as $tank_id => $val4 ) {
+            if (!isset($tanks_structure[$tank_id.'_battles'])) {
+                $sqlarr[] = "ALTER TABLE `col_tank_".$val."`
+                ADD `".$tank_id."_battles` smallint(12) UNSIGNED NOT NULL DEFAULT 0,
+                ADD `".$tank_id."_wins` smallint( 12 ) NOT NULL DEFAULT 0,
+                ADD `".$tank_id."_mark_of_mastery` tinyint(1) UNSIGNED NOT NULL DEFAULT 0;";
             }
-            if (count($sel) <> 0) {
-                foreach ($ntanks[$val] as $tank_id => $val4 ) {
-                    if (!isset($sel[0][$tank_id.'_battles'])) {
-                        $sqlarr[] = "ALTER TABLE `col_tank_".$val."`
-                        ADD `".$tank_id."_battles` smallint(12) UNSIGNED NOT NULL DEFAULT 0,
-                        ADD `".$tank_id."_wins` smallint( 12 ) NOT NULL DEFAULT 0,
-                        ADD `".$tank_id."_mark_of_mastery` tinyint(1) UNSIGNED NOT NULL DEFAULT 0;";
-                    }
-                }
-            }
-            if (!empty($sqlarr)) {
-                foreach ($sqlarr as $tsql) {
-                    $q = $db->prepare($tsql);
-                    if ($q->execute() !== TRUE) { die(show_message($q->errorInfo(),__line__,__file__,$tsql)); }
-                }
+        }
+        if (!empty($sqlarr)) {
+            foreach ($sqlarr as $tsql) {
+                $q = $db->prepare($tsql);
+                if ($q->execute() !== TRUE) { die(show_message($q->errorInfo(),__line__,__file__,$tsql)); }
             }
         }
     }
@@ -540,10 +553,10 @@ function update_tanks_db() {
         $q = $db->prepare($sql);
         if ($q->execute() != TRUE) {
             die(show_message($q->errorInfo(),__line__,__file__,$sql));
-        } 
-        $cache->clear_all(array(), ROOT_DIR.'/cache/tanks/',7200);   
+        }
+        $cache->clear_all(array(), ROOT_DIR.'/cache/tanks/');
     }
-    $tmp = get_tank_v2($config); 
+    $tmp = get_api('encyclopedia/tanks');
     $tmp_tanks = tanks();
     if(!empty($tmp_tanks)){
         $current = array_resort($tmp_tanks,'tank_id');
@@ -553,19 +566,18 @@ function update_tanks_db() {
         $updatearr = $toload = array ();
         foreach ($tmp['data'] as $tank_id => $val) {
             if(!isset($current[$val['tank_id']])){
-                $cache_tanks = $cache->get($val['tank_id'], 0, ROOT_DIR.'/cache/tanks/');
+                $cache_tanks = $cache->get($val['tank_id'], 24*60*60, ROOT_DIR.'/cache/tanks/');
                 $updatearr [$tank_id] = $cache_tanks['data'];
                 $updatearr [$tank_id]['tank_id']     = $val['tank_id'];
                 $updatearr [$tank_id]['type']        = $val['type'];
                 $updatearr [$tank_id]['nation_i18n'] = $val['nation_i18n'];
                 $updatearr [$tank_id]['level']       = $val['level'];
                 $updatearr [$tank_id]['nation']      = $val['nation'];
-                if($tank_id == 52225){
-                    $updatearr [$tank_id]['name_i18n']     = 'БТ-СВ';
-                    $updatearr [$tank_id]['image']         = 'http://worldoftanks.ru/static/3.16.0.3.1/encyclopedia/tankopedia/vehicle/ussr-bt-sv.png';
-                    $updatearr [$tank_id]['contour_image'] = 'http://worldoftanks.ru/static/3.16.0.3.1/encyclopedia/tankopedia/vehicle/small/ussr-bt-sv.png';
-                    $updatearr [$tank_id]['image_small']   = 'http://worldoftanks.ru/static/3.16.0.3.1/encyclopedia/tankopedia/vehicle/contour/ussr-bt-sv.png';    
-                } 
+                $updatearr [$tank_id]['name_i18n']   = $val['name_i18n'];
+
+                $pieces = explode(':', $val['name']);
+                $updatearr [$tank_id]['title']      = $pieces['1'];
+
                 if ($val['is_premium']== true) {
                     $updatearr [$val['tank_id']]['is_premium']      = 1;
                 }   else {
@@ -580,7 +592,7 @@ function update_tanks_db() {
         $toload = array_chunk($toload,$config['multiget']*5);
         $tmp = array();
         foreach($toload as $urls){
-            $tmp = array_special_merge($tmp,multiget_v2($urls, 'encyclopedia/tankinfo', $config, array ('contour_image', 'image', 'image_small', 'name_i18n')));
+            $tmp = array_special_merge($tmp,multiget_v2($urls, 'encyclopedia/tankinfo', $config, array ('contour_image', 'image', 'image_small')));
             foreach($tmp as $tank_id => $val){
                 if ((isset($val['status'])) && ($val['status'] == 'ok')) {
                     $cache->set($tank_id, $val, ROOT_DIR.'/cache/tanks/');
@@ -588,23 +600,16 @@ function update_tanks_db() {
             }
         }
         foreach ($tmp as $tank_id => $val) {
-            $updatearr [$tank_id]['name_i18n']     = $val['data']['name_i18n'];
             $updatearr [$tank_id]['image']         = $val['data']['image'];
             $updatearr [$tank_id]['contour_image'] = $val['data']['contour_image'];
             $updatearr [$tank_id]['image_small']   = $val['data']['image_small'];
-            if($tank_id == 52225){
-                $updatearr [$tank_id]['name_i18n']     = 'БТ-СВ';
-                $updatearr [$tank_id]['image']         = 'http://worldoftanks.ru/static/3.16.0.3.1/encyclopedia/tankopedia/vehicle/ussr-bt-sv.png';
-                $updatearr [$tank_id]['contour_image'] = 'http://worldoftanks.ru/static/3.16.0.3.1/encyclopedia/tankopedia/vehicle/small/ussr-bt-sv.png';
-                $updatearr [$tank_id]['image_small']   = 'http://worldoftanks.ru/static/3.16.0.3.1/encyclopedia/tankopedia/vehicle/contour/ussr-bt-sv.png';    
-            } 
         }
 
         unset($tmp);
         if(!empty($updatearr)){
-            $sql = "INSERT INTO `tanks` (`tank_id`, `nation_i18n`, `level`, `nation`, `is_premium`, `name_i18n`, `type`, `image`, `contour_image`, `image_small`) VALUES ";
+            $sql = "INSERT INTO `tanks` (`tank_id`, `nation_i18n`, `level`, `nation`, `is_premium`, `title`, `name_i18n`, `type`, `image`, `contour_image`, `image_small`) VALUES ";
             foreach ($updatearr as $tank_id => $val) {
-                $sql .= "('{$val['tank_id']}', '{$val['nation_i18n']}', '{$val['level']}', '{$val['nation']}', '{$val['is_premium']}', '{$val['name_i18n']}', '{$val['type']}', '{$val['image']}', '{$val['contour_image']}', '{$val['image_small']}'), ";
+                $sql .= "('{$val['tank_id']}', '{$val['nation_i18n']}', '{$val['level']}', '{$val['nation']}', '{$val['is_premium']}',  '{$val['title']}', '{$val['name_i18n']}', '{$val['type']}', '{$val['image']}', '{$val['contour_image']}', '{$val['image_small']}'), ";
             }
             $sql = substr($sql, 0, strlen($sql)-2);
             $sql .= ';';
@@ -621,5 +626,29 @@ function update_tanks_db() {
         }
         die ('Some error with getting data from WG'.$message);  
     }
+}
+
+function update_tanks_single($tank_id) {
+  $tmp = get_api('encyclopedia/tankinfo',array('tank_id'=>$tank_id),array('nation_i18n','name','level','nation','is_premium','name_i18n','type','tank_id','contour_image','image','image_small'));
+
+  if ((isset($tmp['status'])) && ($tmp['status'] == 'ok')) {
+    global $db;
+    $tmp = $tmp['data'][$tank_id];
+
+    $pieces = explode(':', $tmp['name']);
+    $tmp['title'] = $pieces['1'];
+    unset($tmp['name']);
+
+    if ($tmp['is_premium']== true) {
+        $tmp['is_premium'] = 1;
+    }   else {
+        $tmp['is_premium'] = 0;
+    }
+
+    $sql = 'INSERT INTO `tanks` (`'.implode('`,`',array_keys($tmp)).'`) VALUES ("'.implode('","',$tmp).'");';
+    $q = $db->prepare($sql);
+    if ($q->execute() != TRUE) { die(show_message($q->errorInfo(),__line__,__file__,$sql)); }
+
+  }
 }
 ?>

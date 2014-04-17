@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.2 $
+    * @version     $Rev: 3.0.4 $
     *
     */
 
@@ -55,8 +55,8 @@ $gk_block['lightTank']['4'] = 4;
 $gk_block['lightTank']['3'] = 2;
 $gk_block['lightTank']['2'] = 1;
 $gk_block['lightTank']['1'] = 0;
-$gk_block['SPG']['10'] = 0;
-$gk_block['SPG']['9'] = 0;
+$gk_block['SPG']['10'] = 120;
+$gk_block['SPG']['9'] = 74;
 $gk_block['SPG']['8'] = 74;
 $gk_block['SPG']['7'] = 50;
 $gk_block['SPG']['6'] = 36;
@@ -86,30 +86,27 @@ if(isset($_POST['gkdestroyed']) && isset($_POST['Array']) && ($auth->replays)){
 
   $res_check = array_keys($res);
   $gk_time = gk_tanks($gk_block,$db);
+  $reduce = 1;
 
   if($_POST['Array']['win_or_lose'] == 'win') {
-      switch ($_POST['Array']['reduce']) {
-          case 'normal':
-              $reduce = 2;
-              break;
-          case 'start':
-              $reduce = 5;
-              break;
-          case 'gold':
-              $reduce = 10;
-              break;
-          case 'def':
-              $reduce = 1;
-              break;
-      }
-    } else {
-      $reduce = 1;
+    switch ($_POST['Array']['reduce']) {
+        case 'normal':
+            $reduce = 2;
+            break;
+        case 'start':
+            $reduce = 5;
+            break;
+        case 'gold':
+            $reduce = 10;
+            break;
     }
+  }
 
   foreach($_POST['Array']['result'] as $val) {
     if(isset($val['killed']) and in_array($val['name'], $res_check)) {
+        if(!isset($gk_time[$val['vehicleType']])) { $gk_time[$val['vehicleType']] = 168; } //временная заглушка, от несовпадения информации в апи и реплеях
         $eb = $_POST['Array']['time'] + (($gk_time[$val['vehicleType']])/$reduce*60*60);
-        gk_insert_tanks($val,$eb,$db);  // запись в бд
+        gk_insert_tanks($val,$eb);  // запись в бд
     }
   }
   unset($res_check);

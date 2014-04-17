@@ -11,26 +11,9 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.2 $
+    * @version     $Rev: 3.0.4 $
     *
     */
-?>
-<?php
-     $sql = "SELECT MIN(updated_at) FROM ".$db->prefix."col_players";
-     $q = $db->prepare($sql);
-     if ($q->execute() == TRUE) {
-         $mindate = (int) $q->fetchColumn();
-     }   else {
-         $mindate = 0;
-     }
-    $roster_local_array = array();
-    $sql = "SELECT p.nickname, updated_at FROM ".$db->prefix."col_players p, (SELECT MAX(all_battles) AS maxb, nickname FROM ".$db->prefix."col_players GROUP BY nickname) m WHERE p.all_battles = m.maxb AND p.nickname = m.nickname GROUP BY p.nickname";
-    $q = $db->prepare($sql);
-    if ($q->execute() == TRUE) {
-        foreach($q->fetchAll() as $val){
-            $roster_local_array[$val['nickname']] = (int) $val['updated_at'];
-        }
-    }
 ?>
 <div align="center">
     <table id="roster" width="100%" cellspacing="1" class="table-id-<?=$key;?>">
@@ -46,20 +29,18 @@
                 <th><?=$lang['day_clan']; ?></th>
                 <th><?=$lang['role']; ?></th>
                 <th><?=$lang['dateof']; ?></th>
+                <th><?=$lang['last_battle_time']; ?></th>
+            </tr>
                 <th>Отсутствует</th>
             </tr>  
         </thead>
         <tbody>
             <?php foreach($multiclan_info[$config['clan']]['data'][$config['clan']]['members'] as $id => $val){
-                    if($val['created_at'] == ''){
-                        $val['created_at'] = 'Н/Д';
-                        $date = $val['created_at'];
-                    } else {
-                        $date = date('Y.m.d',$val['created_at']);
-                    }
-                    if (array_key_exists($val['account_name'], $roster_local_array)){
-                        $roster_local_num = $roster_local_array[$val['account_name']];
-                        $diff_date = floor((time() - $roster_local_num) / 86400);
+
+                    if ($res[$val['account_name']]['data']['logout_at'] > 0) {
+
+                        $diff_date = round(((time() - $res[$val['account_name']]['data']['logout_at']) / 86400),0);
+
                         switch ($diff_date+1) { // Ну вот глючит switch при 0-м значении, хоть убей его. Кто в курсе решения проблемы, сообщите
                         case ($diff_date <= 3):
                         $color = 'col_blue';
@@ -78,7 +59,6 @@
                         break;
                         }
                     }   else {
-                        $roster_local_num = 'Н/Д';
                         $color = 'col_black';
                         $diff_date = 0;
                     }
@@ -93,19 +73,13 @@
                         <td><?=in_array($id,$company['in_company'])?$company['company_names'][$company['by_id'][$id]]:'';?></td>
                     <? } ?>
                     <td><?=$val['account_id']; ?></td>
-                    <td><?=$date; ?></td>
-                    <td><?php If (is_numeric($val['created_at'])){
-                                       echo floor((time() - mktime(0, 0, 0, date("m", $val['created_at']), date("d", $val['created_at']), date("Y", $val['created_at'])))/(3600*24));
-                              } else { echo $val['created_at']; }; ?></td>
+                    <td><?=($val['created_at'] == '')?$lang['na']:date('Y.m.d',$val['created_at']); ?></td>
+                    <td><?=(is_numeric($val['created_at']))?floor((time() - $val['created_at'])/(86400)):$lang['na']; ?></td>
                     <td><span class="hidden"><?php echo roster_num($val['role']); ?></span><?php echo $val['role_i18n']; ?></td>
-                    <td>
-                        <?php if (is_numeric($roster_local_num)){ ?>
-                                 <span class="hidden"><?php echo $roster_local_num; ?></span>
-                                 <?php echo date('Y.m.d (H:i)',$roster_local_num);
-                              } else {echo $roster_local_num;}; ?></td>
+                    <td><?=($res[$val['account_name']]['data']['logout_at']>0)?'<span class="hidden">'.$res[$val['account_name']]['data']['logout_at'].'</span>'.date('Y.m.d (H:i)',$res[$val['account_name']]['data']['logout_at']):$lang['na'];?></td>
+                    <td><?=($res[$val['account_name']]['data']['last_battle_time']>0)?'<span class="hidden">'.$res[$val['account_name']]['data']['last_battle_time'].'</span>'.date('Y.m.d (H:i)',$res[$val['account_name']]['data']['last_battle_time']):$lang['na'];?></td>
                     <td><?php
                         if ($diff_date != 0) {
-                            if ($roster_local_array[$val['account_name']] == $mindate) echo '≥ ';
                             echo $diff_date;
                         }
                     ?></td>

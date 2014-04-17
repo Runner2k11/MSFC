@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.0.2 $
+    * @version     $Rev: 3.0.4 $
     *
     */
 ?>
@@ -79,7 +79,7 @@
             });
             $('#adminalltabs ul li a').click(function () {window.location.hash = $(this).attr('href');window.scrollTo(0, 0);});
 
-            <?php $tablangs= array ('en', 'pl', 'ru');
+            <?php $tablangs= array ('en', 'pl', 'ru', 'sk');
                   foreach ($tablangs as $val ) { ?>
                      $('#load<?=$val; ?>').click(function(){
                         <?php foreach($tabs_lang[$val] as $key => $val2){ ?>

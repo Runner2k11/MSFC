@@ -11,7 +11,7 @@
 * @copyright   2011-2013 Edd - Aleksandr Ustinov
 * @link        http://wot-news.com
 * @package     Clan Stat
-* @version     $Rev: 3.0.2 $
+* @version     $Rev: 3.0.4 $
 *
 */
 
@@ -39,7 +39,9 @@ $message = '<i>ОШИБКА:</i> <strong>php-pdo_mysql</strong> расширен
 
 /* Обьявляем функцию вывода сообщений о ошибках */
 function show_message($message = NULL,$line = NULL,$file = NULL,$footer = NULL) {
-    header('Content-type: text/html; charset=utf-8');
+    if (!headers_sent()) {
+        header('Content-type: text/html; charset=utf-8');
+    }
     echo '<center><div align="center" class="ui-state-error ui-corner-all">';
     if(isset($message)) {
         if(is_array($message)) {
@@ -75,7 +77,7 @@ function myErrorHandler($errno, $errstr, $errfile, $errline)
         // Этот код ошибки не включен в error_reporting
         return;
     }
-
+    
     $code = NULL;
     if(file_exists($errfile) and is_readable($errfile)) {
         $f = file($errfile);
@@ -161,12 +163,16 @@ $lang['b_chmod_off'] = 'Directory <b>/cache/players</b> doesn\'t exist, or no pe
 $lang['c_chmod_off'] = 'Directory <b>/admin/sql</b> doesn\'t exist, or no permission to write. <br /> Директория <b>/admin/sql</b> не существует, или невозможна запись.';
 $lang['d_chmod_off'] = 'Directory <b>/cache/other/</b> doesn\'t exist, or no permission to write. <br /> Директория <b>/cache/other/</b> не существует, или невозможна запись.';
 $lang['e_chmod_off'] = 'No permission to create files in root directory, pls change permission to 777 to setup mysql connection. <br> Нет доступа на создание файлов в корневой директории модуля, пожалуйста измените права доступа на 777 для настройки MySQL соединения';
+$lang['curl_off'] = '<i>ERROR:</i> <strong>cURL</strong> extention do not loaded, without it this site can\'t function.<br /> В настройках PHP вашего хостинга отключено использование расширения <strong>cURL</strong>, без него Модуль Статистики не будет работать.';
 
 if ( !extension_loaded('pdo') ) {
     show_message($lang['pdo_off']);
 }
 if ( !extension_loaded('pdo_mysql') ) {
     show_message($lang['pdo_mysql_off']);
+}
+if (!extension_loaded("curl")) {
+   show_message($lang['curl_off']);
 }
 if(ini_get('short_open_tag') != 1) {
     show_message($lang['short_tag_off']);
