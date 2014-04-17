@@ -30,7 +30,6 @@
                 <th><?=$lang['role']; ?></th>
                 <th><?=$lang['dateof']; ?></th>
                 <th><?=$lang['last_battle_time']; ?></th>
-            </tr>
                 <th>Отсутствует</th>
             </tr>  
         </thead>
