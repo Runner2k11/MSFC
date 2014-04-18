@@ -38,7 +38,11 @@
 
                     if ($res[$val['account_name']]['data']['logout_at'] > 0) {
 
-                        $diff_date = round(((time() - $res[$val['account_name']]['data']['logout_at']) / 86400),0);
+                        $diff_date = round(((time() - 
+                                     (($res[$val['account_name']]['data']['last_battle_time']>0) ?
+                                       $res[$val['account_name']]['data']['last_battle_time'] :
+                                       $res[$val['account_name']]['data']['logout_at'])
+                                     ) / 86400),0);
 
                         switch ($diff_date+1) { // Ну вот глючит switch при 0-м значении, хоть убей его. Кто в курсе решения проблемы, сообщите
                         case ($diff_date <= 3):
