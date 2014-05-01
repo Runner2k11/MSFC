@@ -60,6 +60,7 @@ function smtmagic()
         $("#b_show_activity").button();
 
         $("#b_show_activity").click( function() {
+            $("#dyn_player_result").html("<div class=\"ui-state-highlight ui-widget-content\" align=\"center\"><?=$lang['index_loading'];?> <img src=\"../images/ajax-loader.gif\" align=\"middle\"></div>").show();
             $.ajax({
                 cache: true,
                 type: "POST",
