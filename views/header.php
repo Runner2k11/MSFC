@@ -43,6 +43,45 @@
     <script type="text/javascript" src="./js/jquery.vticker.js"></script>
     <script type="text/javascript" src="./js/msfc.shared.js"></script>
 
+    <script type="text/javascript" id="js">
+    $.tablesorter.addWidget({
+        id: "counter",
+        priority: 15,
+        options: {
+          sort_start    : 1,
+          sort_header   : '№',
+          sort_align    : "center",
+        },
+        init: function(table, tW, c, wo) {
+          if (c.theme  == 'jui') {
+            // add <th> in <thead> for counter
+            $(table).find("thead tr").filter(':visible').each(function() {
+              $( this ).prepend( '<th align="' + wo.sort_align + '" class="tablesorter-counter-temp sorter-false">' + wo.sort_header + '</th>' );
+            });
+            //add <td> for every visible row of table
+            $(table).find("tbody tr").filter(':visible').each(function(i) {
+              $( this ).prepend( '<td align="' + wo.sort_align + '" class="tablesorter-counter">' + (i+wo.sort_start) + '</td>' );
+            });
+            // in case if we have <tfoot>
+            $(table).find("tfoot tr").filter(':visible').each(function() {
+              $( this ).prepend( '<th align="' + wo.sort_align + '" class="tablesorter-counter-temp">' + wo.sort_header + '</th>' );
+            });
+          }
+        },
+        format: function(table, c, wo) {
+          if (c.theme == 'jui') {
+            $(table).find("td.tablesorter-counter").filter(':visible').each(function(j) {
+                $(this).text(j+wo.sort_start);
+            });
+            var display_class = $(table).find('th:last-child').attr('class');
+            $(table).find('th.tablesorter-counter-temp').filter(':visible').each(function() {
+              $(this).removeClass().addClass( display_class ).removeClass( "ui-state-active sorter-false" ).addClass('sorter-false');
+            });
+          }
+        }
+    });
+    </script>
+
     <script type="text/javascript">
         $("#allcontainer").css({'height': $(window).height(), 'width': $(window).width(), 'overflow-x': 'hidden', 'overflow-y': 'hidden' });
         $(document).ready(function() {
@@ -58,13 +97,14 @@
               $("#roster").tablesorter({sortList:[<?=$roster_sortlist;?>], headers:{ 0: { sorter: false}}});
               $("#perform_all_n").tablesorter({sortList:[[0,0]], widgets: ['uitheme','stickyheaders','zebra'] });
 
+              $("#overall").tablesorter({widgets: ['uitheme','stickyheaders','zebra','counter']});
+              $("#battel").tablesorter({widgets: ['uitheme','stickyheaders','zebra','counter']});
+
               $("#best_main")
               .add("#best_medal")
               .add("#active_main")
               .add("#active_medal_1")
-              .add("#overall")
               .add("#perform")
-              .add("#battel")
               .add("#achiv_epic")
               .add("#achiv_major")
               .add("#achiv_hero")
