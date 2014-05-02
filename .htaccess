@@ -12,8 +12,8 @@ RewriteEngine on
 #RewriteRule ^\w+$ /offline.php [L]
 #DirectoryIndex offline.php
 
-#Set default T1NCO
-#RewriteRule ^$ /t1nco
+#Set default DEFS2
+#RewriteRule ^$ /DEFS2
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
