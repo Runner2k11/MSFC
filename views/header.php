@@ -96,6 +96,7 @@
               $("#battel").tablesorter({widgets: ['uitheme','stickyheaders','zebra','counter']});
 
               $("#best_main")
+              .add("#famepoints")
               .add("#best_medal")
               .add("#active_main")
               .add("#active_medal_1")

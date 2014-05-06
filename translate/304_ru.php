@@ -39,4 +39,9 @@
 
   $lang['na'] = 'Н/Д';
   $lang['last_battle_time'] = 'Дата последнего боя';
+  $lang['famepoints_points'] = 'Очки славы';
+  $lang['famepoints_position'] = 'Позиция в Аллее славы';
+  $lang['global_map_n'] = 'Глобальная карта №';
+  $lang['global_map_frozen'] = 'В данный момент все Глобальные карты заморожены.';
+  $lang['global_map_owner'] = 'Владелец провинции';
 ?>

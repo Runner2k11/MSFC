@@ -38,4 +38,9 @@
 
   $lang['na'] = 'n/a';
   $lang['last_battle_time'] = 'Last battle time';
+  $lang['famepoints_points'] = 'Fame Points';
+  $lang['famepoints_position'] = 'Position on the Alley of Fame';
+  $lang['global_map_n'] = 'Global map #';
+  $lang['global_map_frozen'] = 'All Global maps are frozen.';
+  $lang['global_map_owner'] = 'Province owner';
 ?>

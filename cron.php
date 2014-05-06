@@ -24,6 +24,8 @@ if (file_exists(dirname(__FILE__).'/function/mysql.php')) {
 }else{
     define('ROOT_DIR', '.');
 }
+// IS_CRON - this parametr show us thats we running cron.php, to write errors to cron.log. Code for writing errors in including/check.php
+define('IS_CRON', '1');
 //Starting script time execution timer
 $begin_time = microtime(true);
 
@@ -101,7 +103,6 @@ if($config['cron_multi'] == 1){
             }
         }
     }
-    if($log == 1)  fwrite($fh, mydate().": (Info) Current db prefix: ".$dbprefix.", clain ID: ".$config['clan']."\n");
 }                 
 unset($multiclan);
 if(!$dbprefix){

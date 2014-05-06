@@ -153,7 +153,7 @@ INSERT INTO `config` (`name`, `value`) VALUES
 ('new_players', '172800'),
 ('main_progress', '172800'),
 ('medal_progress', '172800'),
-('version', '3.0.3'),
+('version', '304.0'),
 ('new_tanks', '172800'),
 ('application_id', 'demo'),
 ('company', '0'),
@@ -187,6 +187,7 @@ CREATE TABLE IF NOT EXISTS `tabs` (
 --
 
 INSERT INTO `tabs` (`id`, `name`, `file`, `type`, `status`, `auth`) VALUES
+(150, 'Очки славы', 'famepoints.php', 0, 0, 'all'),
 (130, 'Собственность клана', './poss.php', 1, 1, 'all'),
 (120, 'Запланированные атаки', './attack.php', 1, 1, 'all'),
 (115, 'Активность игроков', 'ajax_activity.php', 0, 1, 'all'),

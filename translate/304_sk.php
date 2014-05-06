@@ -40,4 +40,9 @@
 
   $lang['na'] = 'n/a';
   $lang['last_battle_time'] = 'Čas poslednej bitky';
+  $lang['famepoints_points'] = 'Body slávy';
+  $lang['famepoints_position'] = 'Pozícia v Sieni slávy';
+  $lang['global_map_n'] = 'Global map #';
+  $lang['global_map_frozen'] = 'All Global maps are frozen.';
+  $lang['global_map_owner'] = 'Province owner';
 ?>

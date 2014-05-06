@@ -65,6 +65,22 @@ function show_message($message = NULL,$line = NULL,$file = NULL,$footer = NULL) 
         }
     }
     echo '</div></center>';
+
+    //add errors to cron.log when running cron.php
+    if(defined('IS_CRON')){
+      global $log;
+      if($log == 1) {
+        global $fh,$date;
+        fwrite($fh, $date.": (Err) Error while running cron.php, on line: ".$line."\n");
+        if(isset($message) and !empty($message) and is_array($message)) {
+          fwrite($fh, $date.": (Err) Error message: ".trim($message['2'])."\n");
+        } elseif (isset($message) and !empty($message)) {
+          fwrite($fh, $date.": (Err) Error message: ".trim($message)."\n");
+        }
+        if(isset($footer) and !empty($footer) and !is_array($footer))
+        fwrite($fh, $date.": (Err) Error code: ".trim($footer)."\n");
+      }
+    }
 }
 
 /* Создаем функцию подменяющую стандартное отображение ошибок, в ней мы добавим вывод ошибок через функцию show_message,
@@ -105,6 +121,19 @@ function myErrorHandler($errno, $errstr, $errfile, $errline)
 
 /* Применяем созданную функцию */
 set_error_handler("myErrorHandler");
+
+/* Создаем функцию закрывающей конект к БД по завершению работы скрипта */
+/* Функция сработает и при успешном завершении скрипта, и при вызове die*/
+
+function msfc_end_script() {
+  global $db,$q;
+
+  $q = null;
+  $db = null;
+}
+
+/* Применяем функцию */
+register_shutdown_function('msfc_end_script');
 
 /* Создаем папки для кэша */
 
