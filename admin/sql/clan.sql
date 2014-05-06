@@ -1,4 +1,4 @@
--- phpMyAdmin SQL Dump
+﻿-- phpMyAdmin SQL Dump
 -- version 3.5.1
 -- http://www.phpmyadmin.net
 --
@@ -137,7 +137,7 @@ INSERT INTO `config` (`name`, `value`) VALUES
 ('server', 'ru'),
 ('clan', '37'),
 ('cache', '12'),
-('theme', 'ui-lightness'),
+('theme', 'sunny'),
 ('pars', 'curl'),
 ('time', '2'),
 ('dst', '0'),

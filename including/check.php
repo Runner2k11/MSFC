@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /*
 * Project:     Clan Stat
 * License:     Creative Commons - Attribution-Noncommercial-Share Alike 3.0 Unported
@@ -94,7 +94,7 @@ function myErrorHandler($errno, $errstr, $errfile, $errline)
         unset($f);
     }
 
-    if (!isset($config['theme'])) { $config['theme'] = 'ui-lightness'; }
+    if (!isset($config['theme'])) { $config['theme'] = 'sunny'; }
     echo '<link rel="stylesheet" href="./theme/'.$config['theme'].'/jquery-ui.css" type="text/css" media="print, projection, screen" />';
     show_message($errstr,$errline,$errfile,$code);
 

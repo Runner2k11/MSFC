@@ -21,7 +21,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title><?=$lang['admin_title']; ?></title>
     <?php if (!isset($config['theme'])) {
-        $config['theme'] = 'ui-lightness'; } ?>
+        $config['theme'] = 'sunny'; } ?>
     <link rel="stylesheet" href="../theme/<?=$config['theme']; ?>/jquery-ui.css" type="text/css" media="print, projection, screen" />
     <link rel="stylesheet" href="../theme/style.css" type="text/css" media="print, projection, screen" />
 

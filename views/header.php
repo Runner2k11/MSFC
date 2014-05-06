@@ -23,7 +23,7 @@
     if (isset($multiclan_info[$config['clan']]['data'][$config['clan']]['abbreviation']))
         echo " [",$multiclan_info[$config['clan']]['data'][$config['clan']]['abbreviation'],"]"; ?></title>
     <?php if (!isset($config['theme'])) {
-        $config['theme'] = 'ui-lightness'; } ?>
+        $config['theme'] = 'sunny'; } ?>
     <link rel="stylesheet" href="./theme/<?=$config['theme']; ?>/jquery-ui.css" type="text/css" media="print, projection, screen" />
     <link rel="stylesheet" href="./theme/style.css" type="text/css" media="print, projection, screen" />
     <link rel="shortcut icon" href="./favicon.ico">
