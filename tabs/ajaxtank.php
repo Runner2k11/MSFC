@@ -19,6 +19,7 @@
     $(document).ready(function(){
         $("#change_button_tanks").button();
         $("#change_button_tanks").click( function() {
+            $("#result").html("<div class=\"ui-state-highlight ui-widget-content\" align=\"center\"><?=$lang['index_loading'];?> <img src=\"../images/ajax-loader.gif\" align=\"middle\"></div>").show();
             $.ajax({
                 cache: true,
                 type: "POST",
@@ -36,7 +37,6 @@
             });
             return false;
         });
-        $("#change_button_tanks").click();
         $('#id-<?=$key;?>').click(function() {
            $("#tankslist").trigger('applyWidgets');
            return false;
