@@ -201,7 +201,7 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
                                   } else {
                                      $message = '';
                                   }
-                                  fwrite($fh, $date.": (Err) Not correct data for player ".sprintf("%03d", $plc)." with ID : ".$p_id.$message."\n");
+                                  fwrite($fh, mydate().": (Err) Not correct data for player ".sprintf("%03d", $plc)." with ID : ".$p_id.$message."\n");
                                 }
                                 continue;
                               }
@@ -213,7 +213,7 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
                                   }  else {
                                      $message = '';
                                   }
-                                  fwrite($fh, $date.": (Err) Not correct data for player ".sprintf("%03d", $plc)." with ID : ".$p_id.$message."\n");
+                                  fwrite($fh, mydate().": (Err) Not correct data for player ".sprintf("%03d", $plc)." with ID : ".$p_id.$message."\n");
                                 }
                                 continue;
                               }
@@ -225,7 +225,7 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
                                   } else {
                                      $message = '';
                                   }
-                                  fwrite($fh, $date.": (Err) Not correct data for player ".sprintf("%03d", $plc)." with ID : ".$p_id.$message."\n");
+                                  fwrite($fh, mydate().": (Err) Not correct data for player ".sprintf("%03d", $plc)." with ID : ".$p_id.$message."\n");
                                 }
                                 continue;
                               }
@@ -238,7 +238,7 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
                               $to_cache['data']['created_at'] = $new2['data'][$config['clan']]['members'][$p_id]['created_at'];
 
                               $cache->set($p_id, $to_cache, ROOT_DIR.'/cache/players/');
-                              if($log == 1){ fwrite($fh, $date.": (Info) Writing player ".sprintf("%03d", $plc).": ".$res1[$p_id]['data']['nickname']."\n"); }
+                              if($log == 1){ fwrite($fh, mydate().": (Info) Writing player ".sprintf("%03d", $plc).": ".$res1[$p_id]['data']['nickname']."\n"); }
                               cron_insert_pars_data($to_cache, $medals, $tanks, $nations, $time);
 
                             }
