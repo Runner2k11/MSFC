@@ -262,10 +262,35 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
 
 //Delete old data in the database
 include_once(ROOT_DIR.'/admin/func_admin.php');
-$olderdate=150;
-if($log == 1) fwrite($fh, mydate().": (Info) Delete data over ".$olderdate." days in the database\n");
-clean_db_old_cron($olderdate);
-if($log == 1) fwrite($fh, mydate().": (Info) End delete\n");
+$maxDBsize = 48;
+$DBsize = 0;
+$sql = "SHOW TABLE STATUS";
+$q = $db->prepare($sql);
+if ($q->execute() == TRUE) {
+$res = $q->fetchAll();
+foreach($res as $row)
+{
+    $DBsize += $row["Data_length"] + $row["Index_length"];
+}
+$DBsize = ceil($DBsize / 1048576);
+fwrite($fh, mydate().": (Info) MySQL DB size ".$DBsize."Mb\n");
+if ($DBsize > $maxDBsize) {
+    $sql = "SELECT MIN(updated_at) FROM `col_players`;";
+    $q = $db->prepare($sql);
+    if ($q->execute() == TRUE) {
+        $olderdate = ceil((time() - $q->fetchColumn()) / (24*60*60)) - 1;
+        if($log == 1) fwrite($fh, mydate().": (Info) Delete data over ".$olderdate." days in the database\n");
+        clean_db_old_cron($olderdate);
+        if($log == 1) fwrite($fh, mydate().": (Info) End delete\n");
+    }   else {
+        die(show_message($q->errorInfo(),__line__,__file__,$sql));
+    }
+} else {
+    if($log == 1) fwrite($fh, mydate().": (Info) No need to delete data in the database\n");
+}
+} else {
+die(show_message($q->errorInfo(),__line__,__file__,$sql));
+}
 
 //write some data for debug
 if ($log == 1){
