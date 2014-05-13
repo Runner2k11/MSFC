@@ -87,7 +87,10 @@
                                 <form action="<?=$_SERVER['REQUEST_URI']?>#tabs-6" method="post">
                                     <?php foreach($adm_avalTanks['index'] as $index){ ?>
                                         <?=$index;?> - <input type="text" value="<?echo isset($adm_avalTanks['names'][$index])?$adm_avalTanks['names'][$index]:$index;?>" name="Array[title][<?=$index;?>]" style="width: 100px;"><br />
-                                        <?php } ?>
+                                    <?php } ?>
+                                    <?php if(count($multiclan) > 1){ ?>
+                                      <p align="center"><?=$lang['for_all_clans'];?>&nbsp;<input class="iall_multiclans" type="checkbox" name="all_multiclans" value="1" size="2" /></p>
+                                    <?php } ?>
                                     <p><input type="submit" value="<?=$lang['adm_tank_top_submit']?>" name="available_tanks_add_index"></p>
                                 </form>
                               </div><br clear=all>
@@ -128,6 +131,9 @@
                                               } ?>
                                         </tbody>
                                     </table>
+                                    <?php if(count($multiclan) > 1){ ?>
+                                      <p align="center"><?=$lang['for_all_clans'];?>&nbsp;<input class="iall_multiclans" type="checkbox" name="all_multiclans" value="1" size="2" /></p>
+                                    <?php } ?>
                                     <p><input type="submit" value="<?=$lang['adm_tank_top_submit']?>" name="toptanksupd"></p>
                                 </form>
                             <?php } else {
@@ -177,6 +183,16 @@
                            </div>
                         </div>
                         <div class="settingsLine">
+                           <div><?=$lang['admin_lang'];?> API</div>
+                           <div>
+                              <select name="api_lang">
+                                 <? foreach($api_langs as $t => $i) { ?>
+                                  <option value="<?=$t;?>" <?php if($config['api_lang'] == $t){ echo 'selected="selected"';} ?>><?=$i;?></option>
+                                 <? } ?>
+                              </select>
+                           </div>
+                        </div>
+                        <div class="settingsLine">
                            <div><?=$lang['admin_server'];?></div>
                            <div>
                               <select id="iserver" name="server">
@@ -214,6 +230,12 @@
                            <div><?=$lang['admin_multiget'];?></div>
                            <div>
                               <input type="text" name="multiget" value="<?=$config['multiget']; ?>" size="2" />
+                           </div>
+                        </div>
+                        <div class="settingsLine">
+                           <div><?=$lang['admin_try_count'];?></div>
+                           <div>
+                              <input type="text" name="try_count" value="<?=$config['try_count']; ?>" size="2" />
                            </div>
                         </div>
                         <div class="settingsLine">
@@ -271,6 +293,10 @@
                               <?php }?>
                            </div>
                         </div>
+                        <?php if(count($multiclan) > 1){ ?>
+                          <p align="center"><?=$lang['for_all_clans'];?>&nbsp;<input id="iall_multiclans" class="iall_multiclans" type="checkbox" name="all_multiclans" value="1" size="2" /></p>
+                        <?php } ?>
+                        <input type="hidden" value="1" name="tab_redirect_id">
                         <p align="center"><input type="submit" value="<?=$lang['admin_submit'];?>" name="consub"></p>
                      </div>
                      </form>
@@ -735,6 +761,10 @@
                               <input type="text" name="new_tanks" value="<?=$config['new_tanks']; ?>" size="10" /> <?=$lang['admin_sec'];?>
                            </div>
                         </div>
+                        <?php if(count($multiclan) > 1){ ?>
+                          <p align="center"><?=$lang['for_all_clans'];?>&nbsp;<input class="iall_multiclans" type="checkbox" name="all_multiclans" value="1" size="2" /></p>
+                        <?php } ?>
+                        <input type="hidden" value="9" name="tab_redirect_id">
                         <p align="center" class="admin_cdhide"><input type="submit" value="<?=$lang['admin_submit'];?>" name="consub_2"></p>
                       </div>
                       </form>
@@ -774,6 +804,7 @@
                               <input type="text" name="company_count" value="<?=$config['company_count']; ?>" size="10" />
                            </div>
                         </div>
+                        <input type="hidden" value="7" name="tab_redirect_id">
                         <p align="center" class=""><input type="submit" value="<?=$lang['admin_submit'];?>" name="consub_3"></p>
                       </div>
                       </form>

@@ -35,14 +35,9 @@
         header ( 'Location: index.php?page=main'.$multi_get.'#tabs-8' );
         exit;
     }
-    if (isset($_POST['consub']) || isset($_POST['consub_2'])){
+    if (isset($_POST['consub']) || isset($_POST['consub_2']) || isset($_POST['consub_3'])){
         insert_config($_POST);
-        header ( 'Location: index.php?page=main'.$multi_get.'#tabs-1' );
-        exit;
-    }
-    if (isset($_POST['consub_3'])){
-        insert_config($_POST);
-        header ( 'Location: index.php?page=main'.$multi_get.'#tabs-7' );
+        header ( 'Location: index.php?page=main'.$multi_get.'#tabs-'.$_POST['tab_redirect_id'] );
         exit;
     }
     if (isset($_POST['mcsort'])){
@@ -180,7 +175,7 @@
     /*-----------------------------------*/
     //Update top tanks tab info
     if(isset($_POST['toptanksupd'])) {
-        update_top_tanks($_POST['Array']);
+        update_top_tanks($_POST);
     }
     if(isset($_POST['toptanksadd'])) {
 
@@ -237,8 +232,19 @@
             $index_list[$index] = $index;
           }
         }
-        $cache->clear('available_tanks_'.$config['clan'], ROOT_DIR.'/cache/other/');
-        $cache->set('available_tanks_'.$config['clan'],$index_list, ROOT_DIR.'/cache/other/');
+
+        $prefix = array();
+        if(isset($_POST['all_multiclans']) and count($multiclan) > 1){
+            foreach($multiclan as $t) {
+              $prefix[] = $t['id'];
+            }
+        }
+        if(empty($prefix)) { $prefix = array($config['clan']); }
+
+        foreach($prefix as $t) {
+          $cache->clear('available_tanks_'.$t, ROOT_DIR.'/cache/other/');
+          $cache->set('available_tanks_'.$t,$index_list, ROOT_DIR.'/cache/other/');
+        }
         unset($index_list);
     }
     //Get top tanks for Tab
