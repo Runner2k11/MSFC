@@ -68,7 +68,7 @@
             $(table).find("td.tablesorter-counter").filter(':visible').each(function(j) {
                 $(this).text(j+wo.sort_start);
             });
-            var display_class = $(table).find('th:last-child').attr('class');
+            var display_class = $(table).find('th:nth-child(2)').attr('class');
             $(table).find('th.tablesorter-counter-temp').filter(':visible').each(function() {
               $(this).removeClass().addClass( display_class ).removeClass( "ui-state-active sorter-false" ).addClass('sorter-false');
             });
@@ -90,15 +90,19 @@
               }
               ?>
               $("#roster").tablesorter({sortList:[<?=$roster_sortlist;?>], headers:{ 0: { sorter: false}}});
-              $("#perform_all_n").tablesorter({sortList:[[0,0]], widgets: ['uitheme','stickyheaders','zebra'] });
+              $("#perform_all_n").tablesorter({sortList:[[0,0]], widgets: ['uitheme','stickyheaders','zebra','counter'] });
 
-              $("#overall").tablesorter({widgets: ['uitheme','stickyheaders','zebra','counter']});
-              $("#battel").tablesorter({widgets: ['uitheme','stickyheaders','zebra','counter']});
+              $("#best_counter")
+              .add("#overall")
+              .add("#battel")
+              .add("#famepoints")
+              .add("#active_main")
+              .add("#all_medals_stat")
+              .add("#rating_all")
+              .add("#perform_all").tablesorter({widgets: ['uitheme','stickyheaders','zebra','counter']});
 
               $("#best_main")
-              .add("#famepoints")
               .add("#best_medal")
-              .add("#active_main")
               .add("#active_medal_1")
               .add("#perform")
               .add("#achiv_epic")
@@ -107,12 +111,9 @@
               .add("#achiv_special")
               .add("#rating")
               .add("#rating1")
-              .add("#rating_all")
               .add("#average_perform")
               .add("#blocked")
               .add("#all_tanks_stat")
-              .add("#perform_all")
-              .add("#all_medals_stat")
               .add("#available_tanks").tablesorter();
 
               $("#avt1").tablesorter({headers:{ 0: { sorter: false}, 1: {sorter: false}, 2: {sorter: false}}, widgetOptions: {uitheme : 'bootstrap'}});
