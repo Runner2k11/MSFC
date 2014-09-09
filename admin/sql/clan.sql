@@ -85,24 +85,24 @@ CREATE TABLE IF NOT EXISTS `col_players` (
 CREATE TABLE IF NOT EXISTS `col_ratings` (
   `account_id` int(12) NOT NULL,
   `updated_at` int(12) NOT NULL,
-  `battles_count_rank` int(12) NOT NULL,
-  `wins_ratio_rank` int(12) NOT NULL,
-  `frags_count_rank` int(12) NOT NULL,
-  `damage_dealt_rank` int(12) NOT NULL,
-  `xp_avg_rank` int(12) NOT NULL,
-  `xp_max_rank` int(12) NOT NULL,
-  `hits_ratio_rank` int(12) NOT NULL,
-  `battles_count_value` int(12) NOT NULL,
-  `wins_ratio_value` int(12) NOT NULL,
-  `frags_count_value` int(12) NOT NULL,
-  `damage_dealt_value` int(12) NOT NULL,
-  `xp_avg_value` int(12) NOT NULL,
-  `xp_max_value` int(12) NOT NULL,
-  `hits_ratio_value` int(12) NOT NULL,
-  `survived_ratio_rank` int(12) NOT NULL,
-  `survived_ratio_value` int(12) NOT NULL,
-  `global_rating_rank` int(12) NOT NULL,
-  `global_rating_value` int(12) NOT NULL
+  `battles_count_rank` int(12) NOT NULL DEFAULT '0',
+  `wins_ratio_rank` int(12) NOT NULL DEFAULT '0',
+  `frags_count_rank` int(12) NOT NULL DEFAULT '0',
+  `damage_dealt_rank` int(12) NOT NULL DEFAULT '0',
+  `xp_avg_rank` int(12) NOT NULL DEFAULT '0',
+  `xp_max_rank` int(12) NOT NULL DEFAULT '0',
+  `hits_ratio_rank` int(12) NOT NULL DEFAULT '0',
+  `battles_count_value` int(12) NOT NULL DEFAULT '0',
+  `wins_ratio_value` int(12) NOT NULL DEFAULT '0',
+  `frags_count_value` int(12) NOT NULL DEFAULT '0',
+  `damage_dealt_value` int(12) NOT NULL DEFAULT '0',
+  `xp_avg_value` int(12) NOT NULL DEFAULT '0',
+  `xp_max_value` int(12) NOT NULL DEFAULT '0',
+  `hits_ratio_value` int(12) NOT NULL DEFAULT '0',
+  `survived_ratio_rank` int(12) NOT NULL DEFAULT '0',
+  `survived_ratio_value` int(12) NOT NULL DEFAULT '0',
+  `global_rating_rank` int(12) NOT NULL DEFAULT '0',
+  `global_rating_value` int(12) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
@@ -148,14 +148,13 @@ INSERT INTO `config` (`name`, `value`) VALUES
 ('cron_time', '23'),
 ('multiget', '20'),
 ('autoclean', '0'),
-('cron_auth', '0'),
 ('cron_multi', '0'),
 ('a_rights', '2'),
 ('we_loosed', '172800'),
 ('new_players', '172800'),
 ('main_progress', '172800'),
 ('medal_progress', '172800'),
-('version', '310.1'),
+('version', '310.5'),
 ('new_tanks', '172800'),
 ('application_id', 'demo'),
 ('company', '0'),
@@ -275,6 +274,24 @@ INSERT IGNORE INTO `users` (`id`, `user`, `password`, `email`, `group`, `replays
 (1, 'admin', '20ccbe71c69cb25e4e0095483cb63bd394a12b23', 'admin@local.com', 'admin', '1'),
 (2, 'user', '20ccbe71c69cb25e4e0095483cb63bd394a12b23', 'user@local.com', 'user', '0');
 
+-- --------------------------------------------------------
+-- Структура таблицы `achievements`
+
+CREATE TABLE IF NOT EXISTS `achievements` (
+  `name` varchar(40) NOT NULL,
+  `section` varchar(20) NOT NULL,
+  `section_i18n` varchar(40) NOT NULL,
+  `options` text NOT NULL,
+  `section_order` tinyint(2) NOT NULL,
+  `image` varchar(150) NOT NULL,
+  `name_i18n` varchar(20) NOT NULL,
+  `type` varchar(20) NOT NULL,
+  `order` smallint(10) NOT NULL,
+  `description` varchar(250) NOT NULL,
+  `condition` varchar(500) NOT NULL,
+  `hero_info` varchar(250) NOT NULL,
+  KEY `name` (`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

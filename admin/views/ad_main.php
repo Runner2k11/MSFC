@@ -559,6 +559,14 @@
                            </div>
                         </div>
                         <div class="settingsLine">
+                           <div><?=$lang['admin_achievements_db_up'];?></div>
+                           <div>
+                              <form action="<?=$_SERVER['REQUEST_URI']?>#tabs-4" method="post">
+                                  <input type="submit" value="<?=$lang['admin_db_up_but'];?>" name="update_achievements_db">
+                              </form>
+                           </div>
+                        </div>
+                        <div class="settingsLine">
                            <div><?=$lang['admin_clean_db_left_players'];?></div>
                            <div>
                               <form action="<?=$_SERVER['REQUEST_URI']?>#tabs-4" method="post">
@@ -714,12 +722,6 @@
                            </div>
                         </div>
                         <div class="settingsLine admin_cdhide">
-                           <div><?=$lang['admin_cron_auth'];?></div>
-                           <div>
-                              <input <?=($config['cron_auth']=='1')?'checked="yes"':'';?> type="checkbox" name="cron_auth" value="1" size="2" />
-                           </div>
-                        </div>
-                        <div class="settingsLine admin_cdhide">
                            <div><?=$lang['admin_cron_multi'];?></div>
                            <div>
                               <input <?=($config['cron_multi']=='1')?'checked="yes"':'';?> type="checkbox" name="cron_multi" value="1" size="2" />
@@ -773,9 +775,7 @@
                         <div class="settingsLine">
                           <h3><?=$lang['current_cron'];?></h3>
                           <?php if(file_exists(ROOT_DIR.'/cron.log') || is_readable(ROOT_DIR.'/cron.log')){ ?>
-                              <textarea rows="10" cols="85" name="text">
-                                  <?=file_get_contents(ROOT_DIR.'/cron.log'); ?>
-                              </textarea>
+                              <textarea rows="10" cols="85" name="text"><?=file_get_contents(ROOT_DIR.'/cron.log'); ?></textarea>
                           <?php } ?>
                         </div>
                         <div class="settingsLine">

@@ -21,149 +21,6 @@ function marks() {
     return $a;
 }
 
-function medn($nations) {
-    $medn = array();
-    $nations_id = array('ussr' => 0,  'germany' => 1, 'usa' => 2, 'china' => 3, 'france' => 4, 'uk' => 5, 'japan' => 6); //
-    $tename = 'tank_expert';
-    $mename = 'mechanic_engineer';
-    foreach ($nations as $val2) {
-        $val = $val2['nation'];
-        if (isset($nations_id[$val])){
-            $medn[$tename.'_'.$val]['img'] = 'images/medals/tankExpert'.$nations_id[$val].'.png';
-            $medn[$mename.'_'.$val]['img'] = 'images/medals/mechanicEngineer'.$nations_id[$val].'.png';
-            $medn[$tename.'_'.$val]['type'] = 'expert';
-            $medn[$mename.'_'.$val]['type'] = 'mechanic';
-        }
-    }
-
-    $medn['medal_ekins']['img'] = 'images/medals/medalEkins1.png';
-    $medn['medal_carius']['img'] = 'images/medals/medalCarius1.png';
-    $medn['medal_kay']['img'] = 'images/medals/medalKay1.png';
-    $medn['medal_le_clerc']['img'] = 'images/medals/medalLeClerc1.png';
-    $medn['medal_abrams']['img'] = 'images/medals/medalAbrams1.png';
-    $medn['medal_poppel']['img'] = 'images/medals/medalPoppel1.png';
-    $medn['medal_lavrinenko']['img'] = 'images/medals/medalLavrinenko1.png';
-    $medn['medal_knispel']['img'] = 'images/medals/medalKnispel1.png';
-
-    for ($i=0; $i<=4; $i++) {
-        if($i == 0) { $j = 4; } else { $j = $i; }
-        $medn['medal_abrams'][$i]['img'] = 'images/medals/medalAbrams'.$j.'.png';
-        $medn['medal_carius'][$i]['img'] = 'images/medals/medalCarius'.$j.'.png';
-        $medn['medal_ekins'][$i]['img'] = 'images/medals/medalEkins'.$j.'.png';
-        $medn['medal_kay'][$i]['img'] = 'images/medals/medalKay'.$j.'.png';
-        $medn['medal_knispel'][$i]['img'] = 'images/medals/medalKnispel'.$j.'.png';
-        $medn['medal_lavrinenko'][$i]['img'] = 'images/medals/medalLavrinenko'.$j.'.png';
-        $medn['medal_le_clerc'][$i]['img'] = 'images/medals/medalLeClerc'.$j.'.png';
-        $medn['medal_poppel'][$i]['img'] = 'images/medals/medalPoppel'.$j.'.png';
-    }
-
-    $medn['armor_piercer']['img'] = 'images/medals/armorPiercer.png';
-    $medn['beasthunter']['img'] = 'images/medals/beasthunter.png';
-    $medn['bombardier']['img'] = 'images/medals/bombardier.png';
-    $medn['defender']['img'] = 'images/medals/defender.png';
-    $medn['diehard']['img'] = 'images/medals/diehard.png';
-    $medn['evileye']['img'] = 'images/medals/evileye.png';
-    $medn['hand_of_death']['img'] = 'images/medals/handOfDeath.png';
-    $medn['medal_heroes_of_rassenay']['img'] = 'images/medals/heroesOfRassenay.png';
-    $medn['huntsman']['img'] = 'images/medals/huntsman.png';
-    $medn['invader']['img'] = 'images/medals/invader.png';
-    $medn['invincible']['img'] = 'images/medals/invincible.png';
-    $medn['iron_man']['img'] = 'images/medals/ironMan.png';
-    $medn['kamikaze']['img'] = 'images/medals/kamikaze.png';
-    $medn['lucky_devil']['img'] = 'images/medals/luckyDevil.png';
-    $medn['mechanic_engineer']['img'] = 'images/medals/mechanicEngineer.png';
-    $medn['medal_billotte']['img'] = 'images/medals/medalBillotte.png';
-    $medn['medal_boelter']['img'] = 'images/medals/medalWittmann.png';
-    $medn['medal_brothers_in_arms']['img'] = 'images/medals/medalBrothersInArms.png';
-    $medn['medal_bruno_pietro']['img'] = 'images/medals/medalBrunoPietro.png';
-    $medn['medal_burda']['img'] = 'images/medals/medalBurda.png';
-    $medn['medal_crucial_contribution']['img'] = 'images/medals/medalCrucialContribution.png';
-    $medn['medal_delanglade']['img'] = 'images/medals/medalDeLanglade.png';
-    $medn['medal_dumitru']['img'] = 'images/medals/medalDumitru.png';
-    $medn['medal_fadin']['img'] = 'images/medals/medalFadin.png';
-    $medn['medal_halonen']['img'] = 'images/medals/medalHalonen.png';
-    $medn['medal_kolobanov']['img'] = 'images/medals/medalKolobanov.png';
-    $medn['medal_lafayette_pool']['img'] = 'images/medals/medalLafayettePool.png';
-    $medn['medal_lehvaslaiho']['img'] = 'images/medals/medalLehvaslaiho.png';
-    $medn['medal_nikolas']['img'] = 'images/medals/medalNikolas.png';
-    $medn['medal_orlik']['img'] = 'images/medals/medalOrlik.png';
-    $medn['medal_oskin']['img'] = 'images/medals/medalOskin.png';
-    $medn['medal_pascucci']['img'] = 'images/medals/medalPascucci.png';
-    $medn['medal_radley_walters']['img'] = 'images/medals/medalRadleyWalters.png';
-    $medn['medal_tamada_yoshio']['img'] = 'images/medals/medalTamadaYoshio.png';
-    $medn['medal_tarczay']['img'] = 'images/medals/medalTarczay.png';
-    $medn['mousebane']['img'] = 'images/medals/mousebane.png';
-    $medn['patton_valley']['img'] = 'images/medals/pattonValley.png';
-    $medn['raider']['img'] = 'images/medals/raider.png';
-    $medn['scout']['img'] = 'images/medals/scout.png';
-    $medn['sinai']['img'] = 'images/medals/sinai.png';
-    $medn['sniper']['img'] = 'images/medals/sniper.png';
-    $medn['steelwall']['img'] = 'images/medals/steelwall.png';
-    $medn['sturdy']['img'] = 'images/medals/sturdy.png';
-    $medn['supporter']['img'] = 'images/medals/supporter.png';
-    $medn['tank_expert']['img'] = 'images/medals/tankExpert.png';
-    $medn['title_sniper']['img'] = 'images/medals/titleSniper.png';
-    $medn['warrior']['img'] = 'images/medals/warrior.png';
-
-    $medn['tank_expert']['type'] = 'expert';
-    $medn['mechanic_engineer']['type'] = 'mechanic';
-    $medn['medal_halonen']['type'] = 'epic';
-    $medn['invader']['type'] = 'hero';
-    $medn['medal_fadin']['type'] = 'epic';
-    $medn['armor_piercer']['type'] = 'special';
-    $medn['mousebane']['type'] = 'special2';
-    $medn['defender']['type'] = 'hero';
-    $medn['supporter']['type'] = 'hero';
-    $medn['steelwall']['type'] = 'hero';
-    $medn['medal_orlik']['type'] = 'epic';
-    $medn['hand_of_death']['type'] = 'special';
-    $medn['sniper']['type'] = 'hero';
-    $medn['warrior']['type'] = 'hero';
-    $medn['title_sniper']['type'] = 'special';
-    $medn['medal_boelter']['type'] = 'epic';
-    $medn['medal_burda']['type'] = 'epic';
-    $medn['scout']['type'] = 'hero';
-    $medn['beasthunter']['type'] = 'special2';
-    $medn['kamikaze']['type'] = 'special';
-    $medn['raider']['type'] = 'special';
-    $medn['medal_oskin']['type'] = 'epic';
-    $medn['medal_billotte']['type'] = 'epic';
-    $medn['medal_kolobanov']['type'] = 'epic';
-    $medn['invincible']['type'] = 'special';
-    //   $medn['lumberjack']['type'] = 'special';
-    $medn['diehard']['type'] = 'special';
-    $medn['medal_carius']['type'] = 'major';
-    $medn['medal_ekins']['type'] = 'major';
-    $medn['medal_kay']['type'] = 'major';
-    $medn['medal_le_clerc']['type'] = 'major';
-    $medn['medal_abrams']['type'] = 'major';
-    $medn['medal_poppel']['type'] = 'major';
-    $medn['medal_lavrinenko']['type'] =  'major';
-    $medn['medal_knispel']['type'] =  'major';
-    $medn['sinai']['type'] = 'special2';
-    $medn['evileye']['type'] = 'hero';
-    $medn['medal_delanglade']['type'] = 'epic2';
-    $medn['medal_tamada_yoshio']['type'] = 'epic2';
-    $medn['medal_nikolas']['type'] = 'epic2';
-    $medn['medal_lehvaslaiho']['type'] = 'epic2';
-    $medn['medal_dumitru']['type'] = 'epic2';
-    $medn['medal_pascucci']['type'] = 'epic2';
-    $medn['medal_lafayette_pool']['type'] = 'epic2';
-    $medn['medal_radley_walters']['type'] = 'epic2';
-    $medn['medal_tarczay']['type'] = 'epic2';
-    $medn['medal_bruno_pietro']['type'] = 'epic2';
-    $medn['medal_crucial_contribution']['type'] = 'epic';
-    $medn['medal_brothers_in_arms']['type'] = 'epic';
-    $medn['medal_heroes_of_rassenay']['type'] = 'epic2';
-    $medn['bombardier']['type'] = 'special';
-    $medn['huntsman']['type'] = 'epic';
-    $medn['lucky_devil']['type'] = 'special2';
-    $medn['iron_man']['type'] = 'special2';
-    $medn['sturdy']['type'] = 'special2';
-    $medn['patton_valley']['type'] = 'special2';
-    return $medn;
-}
-
 function tanks() {
     global $db;
     $sql = " SELECT * FROM `tanks` ORDER BY tank_id ASC;";
@@ -473,50 +330,52 @@ function read_multiclan($dbprefix = FALSE)
 {
     global $db;
     if($dbprefix == FALSE){
-        $sql = "SELECT * FROM multiclan ORDER BY sort ASC;";
+        $sql = "SELECT * FROM `multiclan` ORDER BY sort ASC;";
     }else{
-        $sql = "SELECT * FROM multiclan WHERE prefix = '".$dbprefix."' ORDER BY sort ASC;";
+        $sql = "SELECT * FROM `multiclan` WHERE prefix = '".$dbprefix."' ORDER BY sort ASC;";
     }
     $q = $db->prepare($sql);
     if ($q->execute() == TRUE) {
         return $q->fetchAll(PDO::FETCH_ASSOC);
-    }else{ 
+    }else{
         die(show_message($q->errorInfo(),__line__,__file__,$sql));
-    }     
+    }
 }
 
 function autoclean($time,$multi,$config,$directory)
 {
     global $cache,$db;
-    //$global = array(); 
+    //$global = array();
     if(($config['autoclean'] + $time) <= now()){
         $map = directory_map($directory);
         foreach($multi as $val){
             $new = $cache->get('get_last_roster_'.$val['id'],0);
-            if($new === FALSE) 
-            { 
+            if($new === FALSE)
+            {
                 $new = get_clan_v2($config['clan'], 'info', $config);
-            }else{
-                $cache->clear('get_last_roster_'.$val['id']);
-                $cache->set('get_last_roster_'.$val['id'], $new);
             }
             //print_r($new); die;
-            foreach($new['data']['members'] as $player){
-                foreach($map as $key => $file){
-                    if(sha1($player['account_name']) == $file){
-                        unset($map[$key]);
-                    }
-                }
-            } 
+            if(isset($new['data'][$val['id']]['members']) and !empty($new['data'][$val['id']]['members']))
+            {
+              foreach($new['data'][$val['id']]['members'] as $player){
+                  foreach($map as $key => $file){
+                      if(sha1($player['account_id']) == $file){
+                          unset($map[$key]);
+                      }
+                  }
+              }
+            }
             $sql = "UPDATE ".$val['prefix']."config SET value = '".now()."' WHERE name = 'autoclean';";
             $q = $db->prepare($sql);
             if ($q->execute() != TRUE) {
                 die(show_message($q->errorInfo(),__line__,__file__,$sql));
             }
-        }              
-        foreach($map as $file){ 
-            unlink($directory.$file);   
-        }      
+        }
+        if(!empty($map)) {
+          foreach($map as $file){
+              unlink($directory.$file);
+          }
+        }
     }
 }
 function multi_main($multi){
@@ -660,5 +519,159 @@ function update_tanks_single($tank_id) {
     if ($q->execute() != TRUE) { die(show_message($q->errorInfo(),__line__,__file__,$sql)); }
 
   }
+}
+
+function achievements() {
+    global $db;
+    $sql = " SELECT * FROM `achievements` ORDER BY `section_order` ASC, `order` ASC;";
+    $q = $db->prepare($sql);
+    if ($q->execute() == TRUE) {
+        $tmp = $q->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        die(show_message($q->errorInfo(),__line__,__file__,$sql));
+    }
+    $ret = array();
+    foreach ($tmp as $val) {
+        //unserialize options
+        if(!empty($val['options'])) {
+          $val['options'] = unserialize($val['options']);
+        }
+        $ret[$val['name']] = $val;
+    }
+    return $ret;
+}
+
+function update_achievements_db($ach = array()) {
+  global $db,$config,$lang;
+
+  if(empty($ach)) {
+    $ach = achievements();
+  }
+
+  $try = 0;
+  do {
+    $ach_res = array();
+    $ach_res = get_api('encyclopedia/achievements');
+    $try++;
+  }  while ( isset($ach_res['status']) and ($ach_res['status'] == 'ok') and !empty($ach_res['data']) and $try < $config['try_count'] );
+
+  if(isset($ach_res['status']) and ($ach_res['status'] == 'ok') and !empty($ach_res['data'])) {
+
+    $updatearr = array();
+    foreach($ach_res['data'] as $val) {
+      if(!isset($ach[$val['name']])) {
+        $updatearr[] = $val;
+      }
+    }
+    //echop($updatearr);
+    if(!empty($updatearr)) {
+      $sql = 'INSERT INTO `achievements`
+      (`name`, `section`, `section_i18n`, `options`, `section_order`, `image`, `name_i18n`, `type`, `order`, `description`, `condition`, `hero_info`)
+      VALUES  ';
+
+      foreach($updatearr as $val) {
+        if(!empty($val['name'])) {
+          if(empty($val['options'])) {
+            $options = '';
+          } else {
+            $options = serialize($val['options']);
+          }
+          //add more categories
+          if(preg_match('/tankExpert/',$val['name'])) {
+            $val['section'] = 'expert';
+            $val['section_i18n'] = $lang['ach_section_expert'];
+            $val['section_order'] += 20;
+          }
+          if(preg_match('/mechanicEngineer/',$val['name'])) {
+            $val['section'] = 'mechanic';
+            $val['section_i18n'] = $lang['ach_section_mechanic'];
+            $val['section_order'] += 20;
+          }
+          if(preg_match('/histBattle/',$val['name'])) {
+            $val['section'] = 'hist';
+            $val['section_i18n'] = $lang['ach_section_hist'];
+            $val['section_order'] += 10;
+          }
+          //fix links for medals
+          if(empty($val['image'])) {
+            $val['image'] = $val['options']['0']['image'];
+          }
+          $sql .= "(".$db->quote($val['name']).",
+                    '{$val['section']}',
+                    ".$db->quote($val['section_i18n']).",
+                    ".$db->quote($options).",
+                    '{$val['section_order']}',
+                    '{$val['image']}',
+                    ".$db->quote($val['name_i18n']).",
+                    '{$val['type']}',
+                    '{$val['order']}',
+                    ".$db->quote($val['description']).",
+                    ".$db->quote($val['condition']).",
+                    ".$db->quote($val['hero_info'])."), ";
+       }
+      }
+
+      $sql = substr($sql, 0, strlen($sql)-2);
+      $sql .= ';';
+      $q = $db->prepare($sql);
+      if ($q->execute() != TRUE) {
+          die(show_message($q->errorInfo(),__line__,__file__,$sql));
+      }
+    }
+  }
+}
+
+function achievements_split($res,$ach) {
+  $ret = array('sections' => array(), 'split' => array());
+  $counter = array('id' => array(), 'split' => array());
+
+  //list of ach. in clan
+  //except 'class' section
+  foreach($res as $val) {
+    foreach($val['data']['achievements'] as $id => $t) {
+      if(!in_array($id,$counter['id']) and isset($ach[$id]) and $ach[$id]['section'] != 'class') {
+        $counter['id'][] = $id;
+        if(isset($counter['count'][$ach[$id]['section']])) { $counter['count'][$ach[$id]['section']] += 1; } else { $counter['count'][$ach[$id]['section']] = 1;}
+      }
+    }
+  }
+
+  foreach($ach as $val) {
+    //list of sections to display
+    if(!isset($ret['sections'][$val['section']]) and in_array($val['name'],$counter['id'])) {
+      $ret['sections'][$val['section']] = $val['section_i18n'];
+    }
+    //list of ach. to display
+    if(in_array($val['name'],$counter['id'])) {
+      $counter['split'][$val['section']][] = $val['name'];
+    }
+  }
+  //how many ach. in one section
+  $num = count($counter['split']['expert']);
+  if(count($counter['split']['mechanic']) > $num) { $num = count($counter['split']['mechanic']); }
+
+  //chunk ach. to sections
+  foreach($counter['count'] as $id => $n) {
+    if($n > $num) {
+      $ret['split'][$id] = array_chunk($counter['split'][$id], ceil($n/ceil($n/$num)));
+    } else {
+      $ret['split'][$id]['0'] = $counter['split'][$id];
+    }
+  }
+
+  return $ret;
+}
+
+function achievements_ajax_player($ach) {
+  $ret = array('sections' => array(), 'split' => array());
+
+  foreach($ach as $val) {
+    if(!isset($ret[$val['section']])) {
+      $ret['sections'][$val['section']] = $val['section_i18n'];
+    }
+    $ret['split'][$val['section']][] = $val['name'];
+  }
+
+  return $ret;
 }
 ?>

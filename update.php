@@ -53,6 +53,48 @@ require(ROOT_DIR.'/admin/translate/login_'.$config['lang'].'.php');
 
 $cache = new Cache(ROOT_DIR.'/cache/');
 
+if(!isset($config['version']) or !is_numeric($config['version'])) {
+  $config['version'] = (float) 300.0;
+}
+
+$db->replacement2 = '$1$2$3';
+
+if(!isset($config['api_lang'])) {
+
+  //Получаем список префиксов из таблицы multiclan
+  $sql = "SELECT prefix FROM `multiclan`;";
+  $q = $db->prepare($sql);
+  if ($q->execute() == TRUE) {
+     $prefix = $q->fetchAll(PDO::FETCH_COLUMN);
+  }   else {
+     $prefix = array();
+  }
+
+  if(!empty($prefix)) {
+    foreach($prefix as $t) {
+      $db->change_prefix($t);
+      $config = get_config();
+
+      if(!isset($config['api_lang'])) {
+
+        if(in_array($config['lang'],array('en','ru','pl','de','fr','es','zh-cn','tr','cs','th','vi','ko'))) {
+          $lang = $config['lang'];
+        } else {
+          $lang = 'en';
+        }
+
+        $sql = "INSERT INTO `config` (`name`,`value`) VALUES ('api_lang', '".$lang."');";
+        $q = $db->prepare($sql);
+        if ($q->execute() != TRUE) {
+            die(show_message($q->errorInfo(),__line__,__file__,$sql));
+        }
+        echo 'Config table (`api_lang` value) for prefix:',$t,' - updated.<br>';
+        $config['api_lang'] = $lang;
+      }
+    }
+  }
+}
+
 if( (304.0 - (float) $config['version']) > 0 ) {
     //Изменения вносимые в уникальные таблицы (без префикса для клана)
 
@@ -85,7 +127,7 @@ if( (304.0 - (float) $config['version']) > 0 ) {
       if ($q->execute() != TRUE) {
           die(show_message($q->errorInfo(),__line__,__file__,$sql));
       }
-
+      include(ROOT_DIR.'/config/config_'.$config['server'].'.php');
       update_tanks_db();
       echo 'Table `tanks` - updated.<br>';
     }
@@ -94,7 +136,7 @@ if( (304.0 - (float) $config['version']) > 0 ) {
     /****************end******************/
 
     //Получаем список префиксов из таблицы multiclan
-    $sql = "SELECT prefix FROM multiclan;";
+    $sql = "SELECT prefix FROM `multiclan`;";
     $q = $db->prepare($sql);
     if ($q->execute() == TRUE) {
        $prefix = $q->fetchAll(PDO::FETCH_COLUMN);
@@ -283,7 +325,7 @@ if( (304.0 - (float) $config['version']) > 0 ) {
 
 if( (310.1 - (float) $config['version']) > 0 ) {
     //Получаем список префиксов из таблицы multiclan
-    $sql = "SELECT prefix FROM multiclan;";
+    $sql = "SELECT prefix FROM `multiclan`;";
     $q = $db->prepare($sql);
     if ($q->execute() == TRUE) {
        $prefix = $q->fetchAll(PDO::FETCH_COLUMN);
@@ -339,6 +381,293 @@ if( (310.1 - (float) $config['version']) > 0 ) {
       }
     }
 } //if( (310.1 - (float) $config['version']) > 0 )
+
+$db->replacement2 = '$1msfcmt_$2$3';
+
+if( (310.2 - (float) $config['version']) > 0 ) {
+    /****************begin*********************/
+    /*Меняем структуру таблиц до универсальной*/
+    /******************************************/
+
+    //Обнуляем подключение к БД
+    $q = null;
+    $db = null;
+
+    //Создаем чистое подключение
+    try {
+        $db_2 = new PDO ( 'mysql:host=' . $dbhost . ';dbname=' . $dbname, $dbuser, $dbpass);
+    } catch (PDOException $e) {
+        die(show_message($e->getMessage()));
+    }
+    $sql = 'SHOW TABLES;';
+    $q = $db_2->prepare($sql);
+    if ($q->execute() == TRUE) {
+      $tables = $q->fetchAll(PDO::FETCH_COLUMN);
+
+      foreach($tables as $val) {
+        if($val == 'tanks') {
+          $sql = 'RENAME TABLE `tanks` TO `msfcmt_tanks`;';
+          $q = $db_2->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          } else {
+            echo 'Table tanks - renamed.<br>';
+          }
+        }
+        if($val == 'multiclan') {
+          $sql = 'RENAME TABLE `multiclan` TO `msfcmt_multiclan`;';
+          $q = $db_2->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          } else {
+            echo 'Table multiclan - renamed.<br>';
+          }
+        }
+      }
+
+    } else {
+      die(show_message($q->errorInfo(),__line__,__file__,$sql));
+    }
+
+    //Обнуляем подключение к БД
+    $q = null;
+    $db_2 = null;
+    //MYSQL заново
+    include(ROOT_DIR.'/function/mysql.php');
+
+    $sql = 'CREATE TABLE IF NOT EXISTS `achievements` (
+              `name` varchar(40) NOT NULL,
+              `section` varchar(20) NOT NULL,
+              `section_i18n` varchar(20) NOT NULL,
+              `options` text NOT NULL,
+              `section_order` tinyint(2) NOT NULL,
+              `image` varchar(150) NOT NULL,
+              `name_i18n` varchar(20) NOT NULL,
+              `type` varchar(20) NOT NULL,
+              `order` smallint(10) NOT NULL,
+              `description` varchar(250) NOT NULL,
+              `condition` varchar(500) NOT NULL,
+              `hero_info` varchar(250) NOT NULL,
+              KEY `name` (`name`)
+            ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;';
+    $q = $db->prepare($sql);
+    if ($q->execute() != TRUE) {
+        die(show_message($q->errorInfo(),__line__,__file__,$sql));
+    } else {
+      echo 'Table achievements - created.<br>';
+    }
+
+    //Получаем список префиксов из таблицы multiclan
+    $sql = "SELECT prefix FROM `multiclan`;";
+    $q = $db->prepare($sql);
+    if ($q->execute() == TRUE) {
+       $prefix = $q->fetchAll(PDO::FETCH_COLUMN);
+    }   else {
+       $prefix = array();
+    }
+    //Проверяем полученный массив префиксов. Если он не пустой устраиваем цикл, применяющий все префиксы
+    //Для внесения изменений в БД всех мультикланов.
+    if(empty($prefix)) {echo 'Error: Couldn\'t find info about any clan in db.<br>';}
+    if(!empty($prefix)) {
+      foreach($prefix as $t) {
+        $db->change_prefix($t);
+        $config = get_config();
+        /****************begin*****************/
+        /*   Меняем версию модуля в конфиге   */
+        /*************************************/
+        if(!is_numeric($config['version']) or (310.2 - (float) $config['version']) > 0 ) {
+          $sql = "UPDATE `config` SET `value` = '310.2' WHERE `name` = 'version' LIMIT 1 ;";
+          $q = $db->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          }
+          echo 'Config table (`version` value) for prefix:',$t,' - updated.<br>';
+        }
+      }
+    }
+} //if( (310.2 - (float) $config['version']) > 0 )
+
+if( (310.3 - (float) $config['version']) > 0 ) {
+
+    $sql = 'ALTER TABLE `achievements` CHANGE `name_i18n` `name_i18n` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;';
+    $q = $db->prepare($sql);
+    if ($q->execute() != TRUE) {
+        die(show_message($q->errorInfo(),__line__,__file__,$sql));
+    } else {
+      echo 'Table achievements - updated (name_i18n).<br>';
+    }
+
+    //Получаем список префиксов из таблицы multiclan
+    $sql = "SELECT prefix FROM `multiclan`;";
+    $q = $db->prepare($sql);
+    if ($q->execute() == TRUE) {
+       $prefix = $q->fetchAll(PDO::FETCH_COLUMN);
+    }   else {
+       $prefix = array();
+    }
+    //Проверяем полученный массив префиксов. Если он не пустой устраиваем цикл, применяющий все префиксы
+    //Для внесения изменений в БД всех мультикланов.
+    if(empty($prefix)) {echo 'Error: Couldn\'t find info about any clan in db.<br>';}
+    if(!empty($prefix)) {
+      foreach($prefix as $t) {
+        $db->change_prefix($t);
+        $config = get_config();
+        //Удаляем параметр cron_auth
+        if(isset($config['cron_auth'])) {
+          $sql = "DELETE FROM `config` WHERE `name` = 'cron_auth' LIMIT 1;";
+          $q = $db->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          }
+          echo 'Config table (`cron_auth` value) for prefix:',$t,' - removed.<br>';
+        }
+        /****************begin*****************/
+        /*   Меняем версию модуля в конфиге   */
+        /*************************************/
+        if(!is_numeric($config['version']) or (310.3 - (float) $config['version']) > 0 ) {
+          $sql = "UPDATE `config` SET `value` = '310.3' WHERE `name` = 'version' LIMIT 1 ;";
+          $q = $db->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          }
+          echo 'Config table (`version` value) for prefix:',$t,' - updated.<br>';
+        }
+      }
+    }
+} //if( (310.3 - (float) $config['version']) > 0 )
+
+if( (310.4 - (float) $config['version']) > 0 ) {
+      require(ROOT_DIR.'/config/config_'.$config['server'].'.php');
+  $achievements = achievements();
+  // update list of all achievements in game from api if need
+  if (empty($achievements)) {
+      update_achievements_db($achievements);
+      $achievements = achievements();
+  }
+
+  //Получаем список префиксов из таблицы multiclan
+  $sql = "SELECT prefix FROM `multiclan`;";
+  $q = $db->prepare($sql);
+  if ($q->execute() == TRUE) {
+     $prefix = $q->fetchAll(PDO::FETCH_COLUMN);
+  }   else {
+     $prefix = array();
+  }
+  //Проверяем полученный массив префиксов. Если он не пустой устраиваем цикл, применяющий все префиксы
+  //Для внесения изменений в БД всех мультикланов.
+  if(empty($prefix)) {echo 'Error: Couldn\'t find info about any clan in db.<br>';}
+  if(!empty($prefix)) {
+    foreach($prefix as $t) {
+      $db->change_prefix($t);
+      $config = get_config();
+
+      if(!empty($achievements)) {
+        $sql = "show tables like 'col_medals';";
+        $q = $db->prepare($sql);
+        if ($q->execute() == TRUE) {
+            $tmp = $q->fetchAll();
+        }   else {
+            die(show_message($q->errorInfo(),__line__,__file__,$sql));
+        }
+
+        if(count($tmp) > 0) {
+          $sql = "SHOW COLUMNS FROM `col_medals` ;";
+          $q = $db->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          }
+
+          $structure = array_fill_keys($q->fetchAll(PDO::FETCH_COLUMN), 1);
+
+          foreach($structure as $id => $val) {
+            if(!isset($achievements[$id]) && $id != 'account_id' && $id != 'updated_at') {
+              $sql = "ALTER TABLE `col_medals` DROP `{$id}`;";
+              $q = $db->prepare($sql);
+              if ($q->execute() != TRUE) {
+                  die(show_message($q->errorInfo(),__line__,__file__,$sql));
+              }
+            }
+          }
+          echo 'col_medals table for prefix:',$t,' - updated.<br>';
+        }
+      }
+      /****************begin*****************/
+      /*   Меняем версию модуля в конфиге   */
+      /*************************************/
+      if(!is_numeric($config['version']) or (310.4 - (float) $config['version']) > 0 ) {
+        $sql = "UPDATE `config` SET `value` = '310.4' WHERE `name` = 'version' LIMIT 1 ;";
+        $q = $db->prepare($sql);
+        if ($q->execute() != TRUE) {
+            die(show_message($q->errorInfo(),__line__,__file__,$sql));
+        }
+        echo 'Config table (`version` value) for prefix:',$t,' - updated.<br>';
+      }
+    }
+  }
+} //if( (310.3 - (float) $config['version']) > 0 )
+
+if( (310.5 - (float) $config['version']) > 0 ) {
+
+  //Получаем список префиксов из таблицы multiclan
+  $sql = "SELECT prefix FROM `multiclan`;";
+  $q = $db->prepare($sql);
+  if ($q->execute() == TRUE) {
+     $prefix = $q->fetchAll(PDO::FETCH_COLUMN);
+  }   else {
+     $prefix = array();
+  }
+  //Проверяем полученный массив префиксов. Если он не пустой устраиваем цикл, применяющий все префиксы
+  //Для внесения изменений в БД всех мультикланов.
+  if(empty($prefix)) {echo 'Error: Couldn\'t find info about any clan in db.<br>';}
+  if(!empty($prefix)) {
+    foreach($prefix as $t) {
+      $db->change_prefix($t);
+      $config = get_config();
+
+      //Получаем структуру таблицы
+      $sql = "SHOW COLUMNS FROM `col_ratings` ;";
+      $q = $db->prepare($sql);
+      if ($q->execute() != TRUE) {
+          die(show_message($q->errorInfo(),__line__,__file__,$sql));
+      }
+
+      $ratings_structure = array_fill_keys($q->fetchAll(PDO::FETCH_COLUMN), 1);
+
+      foreach($ratings_structure as $id => $tmp) {
+        if(preg_match('/(_rank|_value)$/',$id))  {
+          $sql = 'ALTER TABLE `col_ratings` MODIFY `'.$id.'` int(12) NOT NULL DEFAULT "0";';
+          $q = $db->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          }
+        }
+      }
+
+      $sql = 'ALTER TABLE `col_ratings` ADD INDEX `index` ( `account_id` );';
+      $q = $db->prepare($sql);
+      if ($q->execute() != TRUE) {
+          die(show_message($q->errorInfo(),__line__,__file__,$sql));
+      }
+      echo 'Table col_ratings for prefix:',$t,' - updated.<br>';
+      /****************begin*****************/
+      /*   Меняем версию модуля в конфиге   */
+      /*************************************/
+      if(!is_numeric($config['version']) or (310.5 - (float) $config['version']) > 0 ) {
+        $sql = "UPDATE `config` SET `value` = '310.5' WHERE `name` = 'version' LIMIT 1 ;";
+        $q = $db->prepare($sql);
+        if ($q->execute() != TRUE) {
+            die(show_message($q->errorInfo(),__line__,__file__,$sql));
+        }
+        echo 'Config table (`version` value) for prefix:',$t,' - updated.<br>';
+      }
+    }
+  }
+} //if( (310.5 - (float) $config['version']) > 0 )
+
+//Clear cache
+$cache->clear_all(array(), ROOT_DIR.'/cache/');
+$cache->clear_all(array(), ROOT_DIR.'/cache/players/');
+
 if($config['lang'] == 'ru') { ?>
 <br><br><br>
 Внимательно прочтите отображаемый сверху текст, если он не содержит сообщений о ошибках - обновление завершено успешно, и вы можете продолжать использовать модуль статистики.<br>

@@ -127,7 +127,11 @@ function cron_insert_pars_data($data, $medals, $tanks, $nationsin, $time){
         $col_pl['role'] = $data['role'];
 
         foreach ($medals as $key => $val) {
+          if(isset($data['achievements'][$key])) {
             $col_med[$key] = $data['achievements'][$key];
+          } else {
+            $col_med[$key] = 0;
+          }
         }
         foreach ($data['tanks'] as $key => $val) {
             $col_tanks[$tanks[$val['tank_id']]['nation']][$val['tank_id'].'_battles'] = $val['statistics']['battles'];
@@ -169,7 +173,7 @@ function cron_insert_pars_data($data, $medals, $tanks, $nationsin, $time){
 
 function update_multi_cron($dbprefix) {
     global $db;
-    $sql = "UPDATE multiclan SET cron = '".now()."' WHERE prefix = '".$dbprefix."';";
+    $sql = "UPDATE `multiclan` SET cron = '".now()."' WHERE prefix = '".$dbprefix."';";
     $q = $db->prepare($sql);
     if ($q->execute() != TRUE) {
         die(show_message($q->errorInfo(),__line__,__file__,$sql));

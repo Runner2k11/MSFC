@@ -21,9 +21,8 @@ function base_dir($local = null)
         $local = dirname($_SERVER['PHP_SELF']);
     }
     $full = dirname(__FILE__);
-    $public_base = str_replace($local, "", $full);
 
-    return $public_base;
+    return preg_replace('/'.$local.'[\/\\ ]?$/','',$full);
 } 
 function error($msg) 
 {
@@ -53,10 +52,7 @@ function insert_config($config)
         if(!isset($config['cron_multi'])){
             $config['cron_multi'] = 0;
         }
-        if(!isset($config['cron_auth'])){
-            $config['cron_auth'] = 0;
-        }
-    }      
+    }
     if(isset($config['consub_3'])){
         if(!isset($config['company'])){
           $config['company'] = 0;
@@ -70,7 +66,7 @@ function insert_config($config)
     $prefix = array();
     if(isset($config['all_multiclans'])){
         //Получаем список префиксов из таблицы multiclan
-        $sql = "SELECT prefix FROM multiclan;";
+        $sql = "SELECT prefix FROM `multiclan`;";
         $q = $db->prepare($sql);
         if ($q->execute() == TRUE) {
            $prefix = $q->fetchAll(PDO::FETCH_COLUMN);
@@ -89,7 +85,7 @@ function insert_config($config)
               die(show_message($q->errorInfo(),__line__,__file__,$sql));
           }
           if($name == 'clan'){
-              $sql = "UPDATE multiclan SET id = '".$var."' WHERE main = '1';";
+              $sql = "UPDATE `multiclan` SET id = '".$var."' WHERE main = '1';";
               $q = $db->prepare($sql);
               if ($q->execute() != TRUE) {
                   die(show_message($q->errorInfo(),__line__,__file__,$sql));
@@ -201,7 +197,7 @@ function delete_multi($get){
     if($get['removeclan'] == 1){
         if(isset($get['clan'])){
             if(is_numeric($get['clan'])){
-                $sql = "SELECT * FROM multiclan WHERE id = '".$get['clan']."';";
+                $sql = "SELECT * FROM `multiclan` WHERE id = '".$get['clan']."';";
                 //echo $sql;      
                 $q = $db->prepare($sql);
                 if ($q->execute() == TRUE) {
@@ -233,7 +229,7 @@ function delete_multi($get){
                           }
                       }
 
-                      $sql = "DELETE FROM multiclan WHERE id = '".$get['clan']."';";
+                      $sql = "DELETE FROM `multiclan` WHERE id = '".$get['clan']."';";
                       $q = $db->prepare($sql);
                       if ($q->execute() != TRUE) {
                           die(show_message($q->errorInfo(),__line__,__file__,$sql));
@@ -253,7 +249,7 @@ function add_multiclan($post, $lang){
        if (is_numeric($post['id'])){
            if (preg_match('/^\d/', $post['prefix']) == 0 && strlen(preg_replace('/(.*)_/','$1',$post['prefix'])) <= 5){
                if (ctype_alnum(preg_replace('/(.*)_/','$1',$post['prefix']))){
-                   $sql = "SELECT COUNT(id) FROM multiclan WHERE id = '".$post['id']."';";
+                   $sql = "SELECT COUNT(id) FROM `multiclan` WHERE id = '".$post['id']."';";
                    $q = $db->prepare($sql);
                    if ($q->execute() == TRUE) {
                        $status_clan = $q->fetchColumn();
@@ -261,7 +257,7 @@ function add_multiclan($post, $lang){
                        die(show_message($q->errorInfo(),__line__,__file__,$sql));
                    }
 
-                   $sql = "SELECT COUNT(id) FROM multiclan WHERE prefix = '".$post['prefix']."';";
+                   $sql = "SELECT COUNT(id) FROM `multiclan` WHERE prefix = '".$post['prefix']."';";
                    $q = $db->prepare($sql);
                    if ($q->execute() == TRUE) {
                        $status_prefix = $q->fetchColumn();
@@ -270,7 +266,7 @@ function add_multiclan($post, $lang){
                    }
                    if ($status_clan == 0 ){
                        if ($status_prefix == 0){
-                           $sql = "INSERT INTO multiclan (`".(implode("`,`",array_keys($post)))."`) VALUES ('".(implode("','",$post))."');";
+                           $sql = "INSERT INTO `multiclan` (`".(implode("`,`",array_keys($post)))."`) VALUES ('".(implode("','",$post))."');";
                            $q = $db->prepare($sql);
                            if ($q->execute() != TRUE) {
                                die(show_message($q->errorInfo(),__line__,__file__,$sql));
@@ -520,7 +516,7 @@ function recreat_db()
 {
     global $db,$config;
 
-    $sql = "SHOW TABLES LIKE 'multiclan';";
+    $sql = "SHOW TABLES LIKE '%multiclan';";
     $q = $db->prepare($sql);
     if ($q->execute() == TRUE) {
         $multi_exist = $q->fetchColumn();
@@ -528,7 +524,7 @@ function recreat_db()
         die(show_message($q->errorInfo(),__line__,__file__,$sql));
     }
 
-    if($multi_exist == 'multiclan') {
+    if($multi_exist == 'msfcmt_multiclan') {
 
         $sql = "SELECT `prefix` FROM `multiclan`;";
         $q = $db->prepare($sql);
@@ -537,8 +533,8 @@ function recreat_db()
         }   else {
             die(show_message($q->errorInfo(),__line__,__file__,$sql));
         }
-        foreach($all_prefix as $t) {
 
+        foreach($all_prefix as $t) {
             $sql = "show tables like '".$t['prefix']."%';";
             $q = $db->prepare($sql);
             if ($q->execute() == TRUE) {
@@ -557,19 +553,23 @@ function recreat_db()
         }
     }
 
-    $sql = "DROP TABLE IF EXISTS multiclan;";
+    $sql = "show tables like 'msfcmt_%';";
     $q = $db->prepare($sql);
     if ($q->execute() == TRUE) {
-        $all_prefix = $q->fetchAll(PDO::FETCH_ASSOC);
+        $multi_tables = $q->fetchAll();
     }   else {
         die(show_message($q->errorInfo(),__line__,__file__,$sql));
     }
-    $sql = "DROP TABLE IF EXISTS `users`;";
-    $q = $db->prepare($sql);
-    if ($q->execute() == TRUE) {
-        $all_prefix = $q->fetchAll(PDO::FETCH_ASSOC);
-    }   else {
-        die(show_message($q->errorInfo(),__line__,__file__,$sql));
+
+    if(!empty($multi_tables)) {
+      foreach($multi_tables as $tab){
+          $sql = "DROP TABLE IF EXISTS ".end($tab).";";
+          //echo $sql;
+          $q = $db->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          }
+      }
     }
 }
 function insert_multicaln($id_clan,$server,$dbprefix)
@@ -585,7 +585,7 @@ function insert_multicaln($id_clan,$server,$dbprefix)
         'sort' => 0,
         'server' => $server
     );
-    $sqlt = "INSERT INTO multiclan (".(implode(",",array_keys($insert))).") VALUES ('".(implode("','",$insert))."');";
+    $sqlt = "INSERT INTO `multiclan` (".(implode(",",array_keys($insert))).") VALUES ('".(implode("','",$insert))."');";
     $q = $db->prepare($sqlt);
     if ($q->execute() !== TRUE) {
         die(show_message($q->errorInfo(),__line__,__file__,$sqlt));
@@ -595,7 +595,7 @@ function edit_multi_clan($post)
 {
     global $db;
     foreach($post['Array'] as $id => $val){
-        $sql = 'UPDATE multiclan
+        $sql = 'UPDATE `multiclan`
         SET
         `sort` = "'.$val['order'].'"
         WHERE id = "'.$id.'";';
@@ -639,7 +639,7 @@ function update_top_tanks($array) {
 
     if(isset($array['all_multiclans'])){
         //Получаем список префиксов из таблицы multiclan
-        $sql = "SELECT prefix FROM multiclan;";
+        $sql = "SELECT prefix FROM `multiclan`;";
         $q = $db->prepare($sql);
         if ($q->execute() == TRUE) {
            $prefix = $q->fetchAll(PDO::FETCH_COLUMN);
