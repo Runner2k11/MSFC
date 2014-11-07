@@ -90,7 +90,7 @@
      $mark_of_mastrery = $mark_of_mastrery_d = array_fill(0, 5, 0);
      global $db;
      $b_nation = tanks_nations();
-     $medn = medn($b_nation);
+     $medn = achievements();
      $b_tank_name = tanks();
      $marks = marks();
 
@@ -284,28 +284,17 @@ if (count($b_player_all) >1) {
 
      $roster = roster_sort($resall['data'][$config['clan']]['members']);
      $roster_id = roster_resort_id($roster);
-     $b_pl_mp1 = medal_progress($roster_id, $medn, $b_from11, $b_to11);
+     $b_pl_mp1 = medal_progress(array($b_res['account_id'] => $b_res), $medn, $b_from11, $b_to11);
+     $achievements_sorted = achievements_ajax_player($medn);
      unset($resall, $roster, $roster_id);
      $count_med = 0;
-     Unset($b_pl_mp1['unsort']);
 
-     if (isset($b_pl_mp1['sorted'])) {
-         foreach ($b_pl_mp1['sorted'] as $mdtype => $val) {
-            foreach ($val as $id =>$val2) {
-               if ($id == $b_res['account_id']) $b_pl_mp[$mdtype] = $val2;
-            }
+     if (isset($b_pl_mp1['unsort'])) {
+         foreach ($b_pl_mp1['unsort'] as $mdtype => $val) {
+            if($val > 0) {$count_med += 1;}
         }
      }
-     ksort($b_pl_mp);
-     foreach ($b_pl_mp as $keytype => $val){
-        $ctyp = 0;
-        foreach ($val as $keymedal => $val2){
-           $count_med += $val2;
-           $ctyp += $val2;
-        }
-        if ($ctyp == 0) {unset ($b_pl_mp[$keytype]);}
-     }
-     Unset ($b_pl_mp1);
+
 ?>
 
 <div align="center">
@@ -495,7 +484,7 @@ if (count($b_player_all) >1) {
              <td><span class="hidden">1</span><?=$lang['all_hits_percents'];?>:</td>
              <?php echo '<td>'.$last['all_hits_percents'].'%</td><td colspan="2">'.' '.'</td><td>';
                    if ($diff['all_hits_percents']> 0) {
-                       echo $darkgreen.'+'.$diff['hits_percents'].'%'.$darkend;
+                       echo $darkgreen.'+'.$diff['all_hits_percents'].'%'.$darkend;
                    }   else {echo '0';} ?>
              </td>
            </tr>
@@ -653,8 +642,8 @@ if (count($b_player_all) >1) {
 
       <tr>
         <td><span class="hidden"><?=$val['level'];?></span>
-            <?php if (strlen($val['name_i18n']) > 40) {
-                      $trimmed = substr($val['name_i18n'], 0, 38 );
+            <?php if (strlen($val['name_i18n']) > 20) {
+                      $trimmed = substr($val['name_i18n'], 0, 18 );
                       echo $trimmed.'...';
                   }   else {
                       echo $val['name_i18n'];
@@ -717,22 +706,9 @@ if (count($b_player_all) >1) {
 </div>
 <? };
 if ($count_med>0) {
-      if (isset($b_pl_mp['major'])) {
-         $sql = "SELECT medal_carius, medal_ekins, medal_kay, medal_le_clerc, medal_abrams, medal_poppel, medal_lavrinenko, medal_knispel FROM `col_medals` WHERE account_id = '".$b_res['account_id']."' AND updated_at < '".$b_to11."' AND updated_at >= '".$b_from11."' ORDER BY updated_at DESC;";
-         $q = $db->prepare($sql);
-         if ($q->execute() == TRUE) {
-             $b_medals = $q->fetchAll();
-         }   else {
-             die(show_message($q->errorInfo(),__line__,__file__,$sql));
-         };
-         foreach ($b_pl_mp['major'] as $key => $val){
-            if (($val > 0) ) {
-                 $b_pl_mp['major'][$key]=$b_medals[0][$key];
-            }
-         }
-      }; ?>
+  $data = $b_pl_mp1['unsort'][$b_res['account_id']];
+?>
 <br>
-<div align="center">
 <table cellspacing="1" cellpadding="1" width="100%" id="t-table13">
   <thead>
     <tr>
@@ -740,36 +716,39 @@ if ($count_med>0) {
     </tr>
   </thead>
   <tbody>
-  <?php $i=1; foreach($b_pl_mp as $type_key => $tmp) { ?>
-    <tr>
-      <td align="center">
-          <?php echo '<span class="hidden">'.$i.'</span>';
-                if ($type_key[strlen($type_key)-1]== '2') {
-                    $out = substr($type_key, 0, strlen($type_key)-1);
-                    echo $lang[$out].' - 2';
-                }   else {
-                    echo $lang[$type_key];
-                }   ++$i; ?>
-      </td>
+  <? $i=1; foreach($achievements_sorted['sections'] as $cat => $name) { ?>
+    <tr class="ui-widget-content">
+      <td align="center"><span class="hidden"><?=10*$i;?></span><?=$name;?></td>
     </tr>
     <tr>
-      <td style="border:1px solid #666; text-align:center;"><span class="hidden"><?=$i;?>'</span>
-      <?php foreach($tmp as $tm => $val) {
-               $tm2 = ucfirst($tm);
-               if (($type_key == 'major') && ($val <> '0')) {$tm2 .= $val;};
-               if ($tm<>'lumberjack') { ?>
-                  <div class="medalDiv">
-                    <img width="67" height="71" title="<?php echo '<center>'.$lang['medal_'.$tm].'</center>'.$lang['title_'.$tm]; ?>" class="bb <?php if($val == 0) {echo 'faded';} ?>" alt="<?=$lang['title_'.$tm]; ?>" src="<?=$medn[$tm]['img']; ?>">
-                    <div class="a_num ui-state-highlight ui-widget-content"><?=$val; ?></div>
-                  </div>
-          <?   }
-            } ?>
+      <td class="medalContainer"><span class="hidden"><?=10*$i+1;?></span>
+      <? foreach($achievements_sorted['split'][$cat] as $id) { ?>
+           <? $val = $medn[$id];
+           if(!empty($val['options'])) {
+             if(isset($data[$id])) {
+               $ach_name = $val['options'][$data[$id]-1]['name_i18n'];
+               $ach_img  = $val['options'][$data[$id]-1]['image'];
+             } else {
+               $ach_name = $val['options'][(count($val['options'])-1)]['name_i18n'];
+               $ach_img  = $val['options'][(count($val['options'])-1)]['image'];
+             }
+           } else {
+             $ach_name = $val['name_i18n'];
+             $ach_img  = $val['image'];
+           }
+           ?>
+           <div class="medalDiv">
+              <img width="67" height="71" title="<div style='min-width:400px;'><center><?=$ach_name;?></center><br><?=str_replace('"',"'",$val['description']),(!empty($val['condition'])?'<div style=\'padding:0px;margin:10px 0 0 15px\'>'.nl2br($val['condition']).'</div>':'');?></div>" class="bb <?=(isset($data[$id]) && $data[$id]>0)?'':'faded';?>" src="<?=$ach_img;?>">
+              <? if(isset($data[$id]) && $data[$id]>0) { ?>
+                <div class="a_num ui-state-highlight ui-widget-content"><?=$data[$id],(($val['type']=='series')?'&nbsp;<span style="color:red;">*</span>':'');?></div>
+              <? } ?>
+          </div>
+      <? } ?>
       </td>
     </tr>
-  <? ++$i; }; ?>
+  <? ++$i;} ?>
   </tbody>
 </table>
-</div>
 <? };
 } else {?>
     <div align="center" class="ui-state-highlight ui-widget-content"><?=$lang['error_cron_off_or_none'];?></div>
