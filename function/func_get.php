@@ -11,7 +11,7 @@
 * @copyright   2011-2013 Edd - Aleksandr Ustinov
 * @link        http://wot-news.com
 * @package     Clan Stat
-* @version     $Rev: 3.1.0 $
+* @version     $Rev: 3.1.2 $
 *
 */
 
@@ -51,32 +51,6 @@ function checklang($p) {
   return $return;
 }
 
-function get_clan_v2($clanid, $whattoload, $config, $fields_array = array()) {
-    //whattoload accept 'info', 'provinces', 'battles'
-    $fields = checkfield($fields_array);
-    $url = $config['td']."/wot/clan/".$whattoload."/?application_id=".$config['application_id']."&clan_id=".$clanid.$fields;
-    $ch = curl_init();
-    $timeout = 10;
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        "X-Requested-With: XMLHttpRequest",
-        "Accept: text/html, */*",
-        "User-Agent: Mozilla/3.0 (compatible; easyhttp)",
-        "Connection: Keep-Alive",
-    ));
-    $data = curl_exec($ch);
-    if ($data === false or curl_errno($ch)) {
-        $return = array('status' => 'error', 'error' => array('message' => curl_error($ch)) );
-        curl_close($ch);
-        return $return;
-    }   else {
-        curl_close($ch);
-        return (json_decode(trim($data), true));
-    }
-}
-
 function get_api($method, $param_array = array(), $fields_array = array()) {
     global $config;
 
@@ -89,21 +63,31 @@ function get_api($method, $param_array = array(), $fields_array = array()) {
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         "X-Requested-With: XMLHttpRequest",
         "Accept: text/html, */*",
         "User-Agent: Mozilla/3.0 (compatible; easyhttp)",
         "Connection: Keep-Alive",
     ));
-    $data = curl_exec($ch);
+
+    $try = 0;
+    $return = array();
+    $data = false;
+
+    do {
+      $data = curl_exec($ch);
+      $return = json_decode(trim($data), true);
+      $try++;
+    }  while ( curl_errno($ch) and $try < $config['try_count'] and $return['status'] != 'ok');
+
+
     if ($data === false or curl_errno($ch)) {
         $return = array('status' => 'error', 'error' => array('message' => curl_error($ch)) );
-        curl_close($ch);
-        return $return;
-    }   else {
-        curl_close($ch);
-        return (json_decode(trim($data), true));
     }
+
+    curl_close($ch);
+    return $return;
 }
 
 //------------------------------------------------------------------------------
@@ -128,7 +112,8 @@ function multiget_v2($paramtoload, $clanids, $whattoload, $fields_array = array(
         $curl = new CURL();
         $curl->retry = 2;
         $opts = array(CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => $timeout
+                      CURLOPT_CONNECTTIMEOUT => $timeout,
+                      CURLOPT_FOLLOWLOCATION => false
         );
         usleep(5);
         $url_chunk = array_chunk($urls, 10, TRUE);
@@ -151,6 +136,7 @@ function multiget_v2($paramtoload, $clanids, $whattoload, $fields_array = array(
               curl_setopt($ch[$key], CURLOPT_RETURNTRANSFER, 1);
               curl_setopt($ch[$key], CURLOPT_FAILONERROR, true);
               curl_setopt($ch[$key], CURLOPT_CONNECTTIMEOUT, $timeout);
+              curl_setopt($ch[$key], CURLOPT_FOLLOWLOCATION, false);
               curl_setopt($ch[$key], CURLOPT_HTTPHEADER, array(
                   "X-Requested-With: XMLHttpRequest",
                   "Accept: text/html, */*",
@@ -187,7 +173,7 @@ function multiget_v2($paramtoload, $clanids, $whattoload, $fields_array = array(
                     if (isset($json['error']['message'])) {
                         $message = 'Get current error from WG: ('.$json['error']['message'].')';
                     }   else {
-                        $message = 'Param config[multiget] too big!';
+                        $message = 'No connection to WG API';
                     }
                     $res[$id]['status'] = 'error';
                     $res[$id]['error']['message'] = $message;
@@ -211,6 +197,7 @@ function get_wn8() {
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         "X-Requested-With: XMLHttpRequest",
         "Accept: text/html, */*",

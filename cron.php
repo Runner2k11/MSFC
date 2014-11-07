@@ -11,7 +11,7 @@
 * @copyright   2011-2013 Edd - Aleksandr Ustinov
 * @link        http://wot-news.com
 * @package     Clan Stat
-* @version     $Rev: 3.1.0 $
+* @version     $Rev: 3.1.2 $
 *
 */
 
@@ -114,7 +114,7 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
     if ($config['cron'] == 1){
 
         //check table tanks
-        cron_update_tanks_db();
+        update_tanks_db();
         $nations = tanks_nations();
         $medals = achievements();
         $tanks = tanks();
@@ -123,7 +123,7 @@ if (($multi_prefix[$dbprefix]['cron'] + $config['cron_time']*3600) <= now() ){
 
         //Geting clan roster from wargaming.
         $new = $cache->get('get_last_roster_'.$config['clan'],0);
-        $new2 = get_clan_v2($config['clan'], 'info', $config); //dg65tbhjkloinm
+        $new2 = get_api('clan/info',array('clan_id' => $config['clan']));
         //print_r($new2); die;
         if ($new2 === FALSE) {
             if($log == 1)  fwrite($fh, mydate().": (Err) No roster from WG!"."\n");

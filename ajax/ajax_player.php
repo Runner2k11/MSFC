@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.1.0 $
+    * @version     $Rev: 3.1.2 $
     *
     */
 
@@ -40,6 +40,9 @@
     if ($nickname == '') {
         die('Player Id Undefined!');
     }
+
+    include(ROOT_DIR.'/including/check.php');
+    require(ROOT_DIR.'/admin/translate/api_lang.php');
     require(ROOT_DIR.'/function/auth.php');
     include(ROOT_DIR.'/function/mysql.php');
     require(ROOT_DIR.'/function/func.php');
@@ -60,6 +63,7 @@
     $cache = new Cache(ROOT_DIR.'/cache/');
 
 function p_info($res, $t) {
+   $tstat = array();
    foreach($res as $key => $val) {
       @$chart1[$t[$val['tank_id']]['type']]['total'] += $val['statistics']['battles'];
       @$chart1[$t[$val['tank_id']]['type']]['win'] += $val['statistics']['wins'];
@@ -477,25 +481,20 @@ $result = get_player_clans($pres['data']['nickname'], $config['server']);
 if($result) { $end = end($result);
 if (isset($result)) {
   foreach ($result as $key => $val ) {
-     if (isset ($val['clanids'])) {
-         $new = $cache->get('get_last_roster_'.$val['clanids'],0);
-         if ($new === FALSE) {
-             $new2 = get_clan_v2($val['clanids'], 'info', $config);
-             if (($new2 === FALSE)|| (!isset($new2['status'])) || ((isset($new2['status']))&&($new2['status'] <> 'ok') )) {
-                  $result[$key]['clanlink'] = $config['clan_img'].$val['clanids']."/emblem_64x64.png";
-             }    else {
-                  $result[$key]['clanlink'] = $new2['data'][$val['clanids']]['emblems']['large'];
-                  $cache->set('get_last_roster_'.$val['clanids'], $new2);
-             }
-         } else {
-              if ($new['data'][$val['clanids']]['emblems']['large'] <>'') {
-                  $result[$key]['clanlink'] = $new['data'][$val['clanids']]['emblems']['large'];
-              }   else {
-                  $result[$key]['clanlink'] = $config['clan_img'].$val['clanids']."/emblem_64x64.png";
-              }
+     if(!isset($val['clanids'])) {
+       unset($result[$key]);
+       continue;
+     }
+     $new = $cache->get('get_last_roster_'.$val['clanids'],0);
+     if ($new === FALSE) {
+         $new2 = get_api('clan/info',array('clan_id' => $val['clanids']),array('emblems.large'));
+         if ($new2 != FALSE and isset($new2['status']) and $new2['status'] == 'ok' and isset($new2['data'][$val['clanids']]['emblems']['large']) and $new2['data'][$val['clanids']]['emblems']['large'] != '') {
+              $result[$key]['clanlink'] = $new2['data'][$val['clanids']]['emblems']['large'];
          }
-     }   else {
-         unset($result[$key]);
+     } else {
+          if ($new['data'][$val['clanids']]['emblems']['large'] <>'') {
+              $result[$key]['clanlink'] = $new['data'][$val['clanids']]['emblems']['large'];
+          }
      }
   }
 ?>
@@ -509,7 +508,7 @@ if (isset($result)) {
       <td class="medalContainer" >
       <?php foreach($result as $val) { ?>
         <div class="clanDiv">
-        <img class="hint_small" src="<?=$val['clanlink']; ?>">
+        <img class="hint_small" src="<?=(isset($val['clanlink'])?$val['clanlink']:'./images/no_logo.png'); ?>">
         <br>
         <a href="http://<?php echo $config['gm_url'].'/community/clans/'.$val['clanids']; ?>/" target="_blank">[<?=$val['clantags']; ?>]</a>
         <br>
@@ -553,6 +552,7 @@ if (isset($result)) {
 } // if result
 ?>
 <? $data = $pres['data']['achievements'];?>
+<? if (!empty($data)) { ?>
 <br>
 <table cellspacing="1" cellpadding="1" width="100%" id="player9">
   <thead>
@@ -594,6 +594,8 @@ if (isset($result)) {
   <? ++$i;} ?>
   </tbody>
 </table>
+<? } //end of medals 
+?> 
 <br>
 <?php
 $i=13;

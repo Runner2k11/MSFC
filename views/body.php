@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.1.0 $
+    * @version     $Rev: 3.1.2 $
     *
     */
 
@@ -58,7 +58,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
                     }
                 ?>                                                             
                 <a style="margin: 0 5px;" id="<?=$val['prefix'].'1';?>" href="./index.php<?=$multi_get?>">
-                    <img height="24" border="0" src="<?=$multiclan_info[$val['id']]['data'][$val['id']]['emblems']['small'];?>" /><span style="margin: auto 4px; display:block; color:<?=$multiclan_info[$val['id']]['data'][$val['id']]['clan_color']?>"><?=$multiclan_info[$val['id']]['data'][$val['id']]['abbreviation']?></span>
+                    <img height="24" border="0" src="<?=$multiclan_info[$val['id']]['data'][$val['id']]['emblems']['small'];?>" /><span style="margin: auto 4px; display:block; color:<?=$multiclan_info[$val['id']]['data'][$val['id']]['color']?>"><?=$multiclan_info[$val['id']]['data'][$val['id']]['abbreviation']?></span>
                 </a>
                 <?php
                 }
@@ -86,7 +86,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
                     <img class="bb" src="<?=$multiclan_info[$config['clan']]['data'][$config['clan']]['emblems']['large'];?>"
                     style="padding: 0; margin: 0; height:64px; width:64px;border-width:0;" title='<?=$multiclan_info[$config["clan"]]["data"][$config["clan"]]["description_html"];?>' /></a>
                     <br>
-                    <font color="<?=$multiclan_info[$config['clan']]['data'][$config['clan']]['clan_color'];?>">
+                    <font color="<?=$multiclan_info[$config['clan']]['data'][$config['clan']]['color'];?>">
                         <br><?=$multiclan_info[$config['clan']]['data'][$config['clan']]['name'];?>
                     </font>
                 </td>

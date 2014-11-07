@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.1.0 $
+    * @version     $Rev: 3.1.2 $
     *
     */
 
@@ -53,7 +53,7 @@
     }
     $poss = array();
     if (is_valid_url($config['td']) == true){
-        $poss = get_clan_v2($config['clan'], 'provinces', $config);
+        $poss = get_api('clan/provinces',array('clan_id' => $config['clan']));
     }
     //include(ROOT_DIR.'/views/header.php');
 ?>

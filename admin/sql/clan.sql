@@ -144,6 +144,11 @@ INSERT INTO `config` (`name`, `value`) VALUES
 ('time', '2'),
 ('dst', '0'),
 ('cron', '1'),
+('cron_autoclean', '0'),
+('cron_cleanleft', '1'),
+('cron_cleanold', '1'),
+('cron_cleanold_d', '90'),
+('cron_clean_log', '0'),
 ('news', '1'),
 ('cron_time', '23'),
 ('multiget', '20'),
@@ -154,7 +159,7 @@ INSERT INTO `config` (`name`, `value`) VALUES
 ('new_players', '172800'),
 ('main_progress', '172800'),
 ('medal_progress', '172800'),
-('version', '310.5'),
+('version', '312.0'),
 ('new_tanks', '172800'),
 ('application_id', 'demo'),
 ('company', '0'),
@@ -180,7 +185,8 @@ CREATE TABLE IF NOT EXISTS `tabs` (
   `file` varchar(65) NOT NULL,
   `type` tinyint(1) NOT NULL COMMENT '0 -normal, 1-ajax',
   `status` tinyint(1) NOT NULL COMMENT '0 - Off, 1 - On',
-  `auth` varchar(25) NOT NULL COMMENT 'all, admin, user'
+  `auth` varchar(25) NOT NULL COMMENT 'all, admin, user',
+  UNIQUE KEY `file` (`file`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -221,8 +227,7 @@ CREATE TABLE IF NOT EXISTS `tanks` (
   `image` text NOT NULL,
   `contour_image` text NOT NULL,
   `image_small` text NOT NULL,
-  PRIMARY KEY (`tank_id`),
-  UNIQUE KEY `name_i18n` (`name_i18n`)
+  PRIMARY KEY (`tank_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

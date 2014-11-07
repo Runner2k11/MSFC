@@ -11,13 +11,19 @@
 * @copyright   2011-2013 Edd - Aleksandr Ustinov
 * @link        http://wot-news.com
 * @package     Clan Stat
-* @version     $Rev: 3.1.0 $
+* @version     $Rev: 3.1.2 $
 *
 */
 
 //Получаем информацио о апи
 $api_api = get_api('encyclopedia/info');
 $api_cache = $cache->get('api_info', 0, ROOT_DIR.'/cache/other/');
+//Временный фикс, для тех кто использует промежуточную github версию модуля
+//Фикс необходим т.к. в версии 3.1.0 нет этого в кэше, а в промежуточных github версиях есть, но данные старые, без этого параметра
+//Через релиз после 3.1.0 можно удалять
+if(isset($api_cache['status']) and !isset($api_cache['data']['tanks_updated_at'])) {
+  $api_cache['data']['tanks_updated_at'] = 0;
+}
 
 //В кэше пусто и данные не получены
 if( ( ($api_cache === FALSE) or empty($api_cache) or !isset($api_cache['status']) ) and ( !isset($api_api['status']) or $api_api['status'] != 'ok' or empty($api_api['data']) ) ) {
@@ -31,8 +37,9 @@ if(isset($api_api['status']) and $api_api['status'] == 'ok' and !empty($api_api[
       $api_cache = $api_api;
   }
   //Сравниваем данные о АПИ в кэше и полученные
-  //Если версии отличаются, и с момента апдейта прошло больше двух дней - обновляем
-  if((now() - $api_api['data']['game_updated_at'] >= 2*24*60*60) and $api_api['data']['game_version'] != $api_cache['data']['game_version']) {
+  //Если версии отличаются, и дата обновления данных о технике не совпадает
+  //TODO: если добавится дата обновления информации о наградах, добавить и ее
+  if($api_api['data']['tanks_updated_at'] != $api_cache['data']['tanks_updated_at'] and $api_api['data']['game_version'] != $api_cache['data']['game_version']) {
     //обновляем кэш
     $cache->clear('api_info', ROOT_DIR.'/cache/other/');
     $cache->set('api_info', $api_api, ROOT_DIR.'/cache/other/');
@@ -78,7 +85,7 @@ $multiclan_main = multi_main($multiclan);
 foreach($multiclan as $clan){
     $multiclan_info[$clan['id']] = $cache->get('get_last_roster_'.$clan['id'], 0);
     if (($multiclan_info[$clan['id']] === FALSE) or (empty($multiclan_info[$clan['id']])) or ($clan['id'] == $config['clan'])) {
-        $multiclan_info[$clan['id']] = get_clan_v2($clan['id'],'info', $config);
+        $multiclan_info[$clan['id']] = get_api('clan/info',array('clan_id' => $clan['id']));
         if ((empty($multiclan_info[$clan['id']])) || (!isset($multiclan_info[$clan['id']]['status']))) {
             $multiclan_info[$clan['id']]['status'] = 'error';
         }
@@ -121,7 +128,7 @@ if ((isset($multiclan_info[$config['clan']]['status'])) && ($multiclan_info[$con
         unset($tmp);
     }
 
-    if(!empty($links)) { $try = 0;
+    if(!empty($links)) { $try = 0; $update_eff = 1;
       do {
         $res_base = array();
         $res_base['info'] = multiget_v2('account_id', $links, 'account/info');
@@ -143,7 +150,7 @@ if ((isset($multiclan_info[$config['clan']]['status'])) && ($multiclan_info[$con
             continue;
           }
           //achievements
-          if( !isset($res_base['achievements'][$p_id]['status']) or $res_base['achievements'][$p_id]['status'] != 'ok' ) {
+          if( !isset($res_base['achievements'][$p_id]['status']) or $res_base['achievements'][$p_id]['status'] != 'ok' or empty($res_base['achievements'][$p_id]['data']['frags']) or empty($res_base['achievements'][$p_id]['data']['max_series']) ) {
             continue;
           }
 
@@ -152,7 +159,7 @@ if ((isset($multiclan_info[$config['clan']]['status'])) && ($multiclan_info[$con
           if(isset($to_cache['data']['achievements'])) {
             unset($to_cache['data']['achievements']);
           }
-          $to_cache['data']['achievements'] = $res_base['achievements'][$p_id]['data']['achievements'];
+          $to_cache['data']['achievements'] = array_merge($res_base['achievements'][$p_id]['data']['achievements'],$res_base['achievements'][$p_id]['data']['frags'],$res_base['achievements'][$p_id]['data']['max_series']);
           $to_cache['data']['tanks'] = array_resort($res_base['tanks'][$p_id]['data'],'tank_id');
           $to_cache['data']['ratings'] = $res_base['ratings'][$p_id]['data'];
 
@@ -184,7 +191,22 @@ if(($wn8 === FALSE) or !isset($wn8['data']) or empty($wn8['data'])) {
 }
 /* end wn8 */
 
-$eff_rating = eff_rating($res,$wn8);
+/* code for eff. ratings */
+$eff_rating = $cache->get('eff_ratings_'.$config['clan'], 0, ROOT_DIR.'/cache/other/');
+build_ratings_tables();
+
+if(is_array($eff_rating)) {
+  $tmp = array_diff(array_keys($roster),array_keys($eff_rating));
+  if(!empty($tmp)) { $update_eff = 1; }
+  unset($tmp);
+}
+
+if(isset($update_eff) or $eff_rating == false) {
+  $eff_rating = eff_rating($res,$wn8);
+  $cache->clear('eff_ratings_'.$config['clan'],ROOT_DIR.'/cache/other/');
+  $cache->set('eff_ratings_'.$config['clan'], $eff_rating, ROOT_DIR.'/cache/other/');
+}
+
 $tanks_nation = tanks_nations();
 $tanks_types = tanks_types();
 $tanks_lvl = tanks_lvl();

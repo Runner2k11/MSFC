@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.1.0 $
+    * @version     $Rev: 3.1.2 $
     *
     */
 ?>
@@ -62,10 +62,10 @@
                     }
                 });
             <?php } ?>
-            <?php if(count($multiclan) > 1) { ?>
+            <?php if(isset($multiclan) and count($multiclan) > 1) { ?>
                 $('.iall_multiclans[type=checkbox]').prop('checked', false);
             <?php } ?>
-            <?php if(count($multiclan) > 1 and !isset($_GET['multi']) ) { ?>
+            <?php if(isset($multiclan) and count($multiclan) > 1 and !isset($_GET['multi']) ) { ?>
                 $("#iall_multiclans").change(function() {
                   if($("#iall_multiclans").is(':checked')) {
                     $("#iserver").prop('disabled', true);
@@ -134,6 +134,10 @@
                       url: "../ajax/ajax_company.php"
                   });
                   return false;
+              });
+              $('.company_collapse').click(function() {
+                $("#company_collapse_target" + $(this).attr('company')).toggle();
+                return false;
               });
             <? } ?>
         });

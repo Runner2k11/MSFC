@@ -11,7 +11,7 @@
     * @copyright   2011-2013 Edd - Aleksandr Ustinov
     * @link        http://wot-news.com
     * @package     Clan Stat
-    * @version     $Rev: 3.1.0 $
+    * @version     $Rev: 3.1.2 $
     *
     */
 ?>
@@ -36,7 +36,7 @@
                         $multi_clan_prefix = '&multi='.str_replace('_','',$val['prefix']);
                 } ?>
                 <a style="margin: 0 5px; min-height: 48px; min-width: 48px;" id="<?=$val['prefix'].'1';?>" href="./index.php?page=main<?=$multi_clan_prefix;?>">
-                    <img height="24" src="<?=$multiclan_info[$val['id']]['data'][$val['id']]['emblems']['small'];?>" /><span style="margin: auto 4px; display:block; color:<?=$multiclan_info[$val['id']]['data'][$val['id']]['clan_color']?>"><?=$multiclan_info[$val['id']]['data'][$val['id']]['abbreviation']?></span>
+                    <img height="24" src="<?=$multiclan_info[$val['id']]['data'][$val['id']]['emblems']['small'];?>" /><span style="margin: auto 4px; display:block; color:<?=$multiclan_info[$val['id']]['data'][$val['id']]['color']?>"><?=$multiclan_info[$val['id']]['data'][$val['id']]['abbreviation']?></span>
                 </a>
                 <?php
             } ?>
@@ -395,6 +395,9 @@
                                       } ?>
                               </tbody>
                             </table>
+                            <?php if(count($multiclan) > 1){ ?>
+                              <p align="center"><?=$lang['for_all_clans'];?>&nbsp;<input id="iall_multiclans" class="iall_multiclans" type="checkbox" name="all_multiclans" value="1" size="2" /></p>
+                            <?php } ?>                            
                             <p align="center"><input type="submit" value="<?=$lang['admin_submit'];?>" name="tabsub" /></p>
                           </form>
                           <div class="ui-state-error ui-corner-all"><?=$lang['admin_tab_delete_n'];?></div>
@@ -730,6 +733,37 @@
                         <div class="settingsLine admin_cdhide">
                            <div>&nbsp;</div>
                            <div>
+                              <b><?=$lang['admin_cron_autoclean'];?></b>
+                           </div>
+                        </div>
+                        <div class="settingsLine admin_cdhide">
+                           <div><?=$lang['admin_cron_autoclean_enable'];?></div>
+                           <div>
+                              <input <?=($config['cron_autoclean']=='1')?'checked="yes"':'';?> type="checkbox" name="cron_autoclean" value="1" size="2" />
+                           </div>
+                        </div>
+                        <div class="settingsLine admin_cdhide">
+                           <div><?=$lang['admin_clean_db_left_players'];?></div>
+                           <div>
+                              <input <?=($config['cron_cleanleft']=='1')?'checked="yes"':'';?> type="checkbox" name="cron_cleanleft" value="1" size="2" />
+                           </div>
+                        </div>
+                        <div class="settingsLine admin_cdhide">
+                           <div><?=$lang['admin_clean_db_old_cron'];?></div>
+                           <div>
+                              <input <?=($config['cron_cleanold']=='1')?'checked="yes"':'';?> type="checkbox" name="cron_cleanold" value="1" size="2" />
+                              <?=$lang['clear_old_cron_date_1'];?><input type="text" size="1" name="cron_cleanold_d" value="<?=$config['cron_cleanold_d'];?>" /><?=$lang['clear_old_cron_date_2'];?>
+                           </div>
+                        </div>
+                        <div class="settingsLine admin_cdhide">
+                           <div><?=$lang['admin_cron_autoclean_log'];?></div>
+                           <div>
+                              <input <?=($config['cron_clean_log']=='1')?'checked="yes"':'';?> type="checkbox" name="cron_clean_log" value="1" size="2" />
+                           </div>
+                        </div>
+                        <div class="settingsLine admin_cdhide">
+                           <div>&nbsp;</div>
+                           <div>
                               <b><?=$lang['admin_cron_period']?></b>
                            </div>
                         </div>
@@ -855,8 +889,9 @@
                         </td>
                         <td align="center" width="50%" valign="top">
                           <? for($index=1;$index<=$config['company_count'];$index++){ ?>
-                            <div class="ui-widget-header"><?=isset($adm_company['company_names'][$index])?$adm_company['company_names'][$index]:$index;?></div>
-                              <div class="ui-widget-content pl_list">
+                            <div class="ui-widget-header">
+                             <span style="float:right;margin-right:10px;" class="company_collapse" company="<?=$index;?>"><span class="ui-icon ui-icon-carat-2-n-s"></span></span><?=isset($adm_company['company_names'][$index])?$adm_company['company_names'][$index]:$index;?></div>
+                              <div class="ui-widget-content pl_list" id="company_collapse_target<?=$index;?>">
                                 <ul class="connectedSortable droptrue" id="sortable<?=$index;?>">
                                   <? if(isset($adm_company['list'.$index]) and !empty($adm_company['list'.$index])) { ?>
                                     <? foreach($adm_company['list'.$index] as $val) { ?>

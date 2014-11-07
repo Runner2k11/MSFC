@@ -11,13 +11,13 @@
 * @copyright   2011-2013 Edd - Aleksandr Ustinov
 * @link        http://wot-news.com
 * @package     Clan Stat
-* @version     $Rev: 3.1.0 $
+* @version     $Rev: 3.1.2 $
 *
 */
 
 
 function marks() {
-    $a = array(1=>'/static/3.15.0.4.2/common/img/classes/class-3.png', 2=> '/static/3.15.0.4.2/common/img/classes/class-2.png', 3=> '/static/3.15.0.4.2/common/img/classes/class-1.png', 4=>'/static/3.15.0.4.2/common/img/classes/class-ace.png');
+    $a = array(1=>'/static/3.22.0.2/common/img/classes/class-3.png', 2=> '/static/3.22.0.2/common/img/classes/class-2.png', 3=> '/static/3.22.0.2/common/img/classes/class-1.png', 4=>'/static/3.22.0.2/common/img/classes/class-ace.png');
     return $a;
 }
 
@@ -315,15 +315,18 @@ function get_available_tanks_index() {
 function roster_num($var)
 {
     $data = array();
-    $data['recruit'] = '8';
-    $data['private'] = '7';
-    $data['recruiter'] = '6';    
-    $data['treasurer'] = '5';
-    $data['diplomat'] = '4';
-    $data['commander'] = '3'; 
-    $data['vice_leader'] = '2';  
-    $data['leader'] = '1';
-    return $data[$var];
+    $data['reservist'] = '90';
+    $data['junior_officer'] = '65';
+    $data['personnel_officer'] = '25';
+    $data['recruit'] = '80';
+    $data['private'] = '70';
+    $data['recruiter'] = '60';
+    $data['treasurer'] = '50';
+    $data['diplomat'] = '40';
+    $data['commander'] = '30';
+    $data['vice_leader'] = '20';
+    $data['leader'] = '10';
+    return isset($data[$var])?$data[$var]:100;
 }
 
 function read_multiclan($dbprefix = FALSE)
@@ -352,7 +355,7 @@ function autoclean($time,$multi,$config,$directory)
             $new = $cache->get('get_last_roster_'.$val['id'],0);
             if($new === FALSE)
             {
-                $new = get_clan_v2($config['clan'], 'info', $config);
+                $new = get_api('clan/info',array('clan_id' => $config['clan']));
             }
             //print_r($new); die;
             if(isset($new['data'][$val['id']]['members']) and !empty($new['data'][$val['id']]['members']))
@@ -374,6 +377,23 @@ function autoclean($time,$multi,$config,$directory)
         if(!empty($map)) {
           foreach($map as $file){
               unlink($directory.$file);
+          }
+        }
+
+        //clean db from cron data
+        if($config['cron_autoclean'] == 1) {
+          require(ROOT_DIR.'/admin/func_admin.php');
+
+          if($config['cron_cleanleft'] == 1) {
+            clean_db_left_players();
+          }
+
+          if($config['cron_cleanold'] == 1) {
+            clean_db_old_cron($config['cron_cleanold_d']);
+          }
+
+          if($config['cron_clean_log'] == 1) {
+            cron_file_recreat();
           }
         }
     }
@@ -405,95 +425,54 @@ function get_tables_like_col_tank($dbname){
         die(show_message($q->errorInfo(),__line__,__file__,$sql));
     }
 }
-function update_tanks_db() {
+function update_tanks_db($tanks = array(), $force = 0) {
     global $db,$config,$cache;
-    if(isset($_POST['update_tanks_db'])){
-        $sql = "DELETE from `tanks` WHERE 1;";
-        $q = $db->prepare($sql);
-        if ($q->execute() != TRUE) {
-            die(show_message($q->errorInfo(),__line__,__file__,$sql));
-        }
-        $cache->clear_all(array(), ROOT_DIR.'/cache/tanks/');
+
+    if(empty($tanks)) {
+      $tanks = tanks();
     }
-    $tmp = get_api('encyclopedia/tanks');
-    $tmp_tanks = tanks();
-    if(!empty($tmp_tanks)){
-        $current = array_resort($tmp_tanks,'tank_id');
-    }
-    unset($tmp_tanks);
-    if ((isset($tmp['status'])) && ($tmp['status'] == 'ok')) {
-        $updatearr = $toload = array ();
-        foreach ($tmp['data'] as $tank_id => $val) {
-            if(!isset($current[$val['tank_id']])){
-                $cache_tanks = $cache->get($val['tank_id'], 24*60*60, ROOT_DIR.'/cache/tanks/');
-                $updatearr [$tank_id] = $cache_tanks['data'];
-                $updatearr [$tank_id]['tank_id']     = $val['tank_id'];
-                $updatearr [$tank_id]['type']        = $val['type'];
-                $updatearr [$tank_id]['nation_i18n'] = $val['nation_i18n'];
-                $updatearr [$tank_id]['level']       = $val['level'];
-                $updatearr [$tank_id]['nation']      = $val['nation'];
-                $updatearr [$tank_id]['name_i18n']   = $val['name_i18n'];
+    $tanks_api = get_api('encyclopedia/tanks');
 
-                $pieces = explode(':', $val['name']);
-                $updatearr [$tank_id]['title']      = $pieces['1'];
+    if ((isset($tanks_api['status'])) && ($tanks_api['status'] == 'ok')) {
+      $updatearr = array();
 
-                if ($val['is_premium']== true) {
-                    $updatearr [$val['tank_id']]['is_premium']      = 1;
-                }   else {
-                    $updatearr [$val['tank_id']]['is_premium']      = 0;
-                }
-                if( ($cache_tanks === FALSE) || (empty($cache_tanks)) || ((isset($cache_tanks['status'])) && ($cache_tanks['status']<>'ok')) ) {
-                    $toload[$val['tank_id']] = $val['tank_id'];
-                }
-            }
-        }
-        unset($tmp);
-
-        $tmp = array();
-        if(!empty($toload)){ $try = 0;
-          do {
-            $tmp = array();
-            $tmp = multiget_v2('tank_id', $toload, 'encyclopedia/tankinfo', array ('contour_image', 'image', 'image_small'));
-            foreach($tmp as $tank_id => $val){
-                if ((isset($val['status'])) && ($val['status'] == 'ok') && !empty($val['data'])) {
-                    $cache->set($tank_id, $val, ROOT_DIR.'/cache/tanks/');
-                    $updatearr [$tank_id]['image']         = $val['data']['image'];
-                    $updatearr [$tank_id]['contour_image'] = $val['data']['contour_image'];
-                    $updatearr [$tank_id]['image_small']   = $val['data']['image_small'];
-
-                    unset($toload[$tank_id]);
-                }
-            }
-          $try++;
-          }  while ( !empty($toload) and $try < $config['try_count'] );
-
-        }
-        //some tanks not loaded
-        if(!empty($toload)) {
-          foreach($toload as $tank_id) {
-            unset($updatearr[$tank_id]);
+      if(isset($_POST['update_tanks_db']) or $force == 1){
+          $sql = "TRUNCATE TABLE `tanks`;";
+          $q = $db->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
           }
-        }
-        unset($tmp);
-        if(!empty($updatearr)){
-            $sql = "INSERT INTO `tanks` (`tank_id`, `nation_i18n`, `level`, `nation`, `is_premium`, `title`, `name_i18n`, `type`, `image`, `contour_image`, `image_small`) VALUES ";
-            foreach ($updatearr as $tank_id => $val) {
-                $sql .= "('{$val['tank_id']}', '{$val['nation_i18n']}', '{$val['level']}', '{$val['nation']}', '{$val['is_premium']}',  '{$val['title']}', '{$val['name_i18n']}', '{$val['type']}', '{$val['image']}', '{$val['contour_image']}', '{$val['image_small']}'), ";
+          $tanks = array();
+      }
+
+      foreach ($tanks_api['data'] as $tank_id => $val) {
+        if(!isset($tanks[$tank_id])){
+            $updatearr [$tank_id] = $val;
+
+            $pieces = explode(':', $val['name']);
+            $updatearr [$tank_id]['title']      = $pieces['1'];
+
+            if ($val['is_premium']== true) {
+                $updatearr [$tank_id]['is_premium']      = 1;
+            }   else {
+                $updatearr [$tank_id]['is_premium']      = 0;
             }
-            $sql = substr($sql, 0, strlen($sql)-2);
-            $sql .= ';';
-            $q = $db->prepare($sql);
-            if ($q->execute() != TRUE) {
-                die(show_message($q->errorInfo(),__line__,__file__,$sql));
-            }
         }
-    }   else {
-        if (isset($tmp['error']['message'])) {
-            $message = ' ( '.$tmp['error']['message'].' )';
-        }   else {
-            $message = '';
-        }
-        die ('Some error with getting data from WG'.$message);  
+      }
+
+      if(!empty($updatearr)){
+          $sql = "INSERT INTO `tanks` (`tank_id`, `nation_i18n`, `level`, `nation`, `is_premium`, `title`, `name_i18n`, `type`, `image`, `contour_image`, `image_small`) VALUES ";
+          foreach ($updatearr as $tank_id => $val) {
+              $sql .= "('{$val['tank_id']}', '{$val['nation_i18n']}', '{$val['level']}', '{$val['nation']}', '{$val['is_premium']}',  '{$val['title']}', '{$val['name_i18n']}', '{$val['type']}', '{$val['image']}', '{$val['contour_image']}', '{$val['image_small']}'), ";
+          }
+          $sql = substr($sql, 0, strlen($sql)-2);
+          $sql .= ';';
+          $q = $db->prepare($sql);
+          if ($q->execute() != TRUE) {
+              die(show_message($q->errorInfo(),__line__,__file__,$sql));
+          }
+      }
+
     }
 }
 
@@ -548,12 +527,7 @@ function update_achievements_db($ach = array()) {
     $ach = achievements();
   }
 
-  $try = 0;
-  do {
-    $ach_res = array();
-    $ach_res = get_api('encyclopedia/achievements');
-    $try++;
-  }  while ( isset($ach_res['status']) and ($ach_res['status'] == 'ok') and !empty($ach_res['data']) and $try < $config['try_count'] );
+  $ach_res = get_api('encyclopedia/achievements');
 
   if(isset($ach_res['status']) and ($ach_res['status'] == 'ok') and !empty($ach_res['data'])) {
 
@@ -623,18 +597,23 @@ function update_achievements_db($ach = array()) {
 
 function achievements_split($res,$ach) {
   $ret = array('sections' => array(), 'split' => array());
-  $counter = array('id' => array(), 'split' => array());
+  $counter = array('id' => array(), 'split' => array(), 'count' => array());
+  $num = $n = $m = 0;
 
   //list of ach. in clan
   //except 'class' section
   foreach($res as $val) {
-    foreach($val['data']['achievements'] as $id => $t) {
-      if(!in_array($id,$counter['id']) and isset($ach[$id]) and $ach[$id]['section'] != 'class') {
-        $counter['id'][] = $id;
-        if(isset($counter['count'][$ach[$id]['section']])) { $counter['count'][$ach[$id]['section']] += 1; } else { $counter['count'][$ach[$id]['section']] = 1;}
+    if(!empty($val['data']['achievements'])) {
+      foreach($val['data']['achievements'] as $id => $t) {
+        if(!in_array($id,$counter['id']) and isset($ach[$id]) and $ach[$id]['section'] != 'class') {
+          $counter['id'][] = $id;
+          if(isset($counter['count'][$ach[$id]['section']])) { $counter['count'][$ach[$id]['section']] += 1; } else { $counter['count'][$ach[$id]['section']] = 1;}
+        }
       }
     }
   }
+
+  if(empty($counter['id'])) return array(); //no ach. in clan - return empty array
 
   foreach($ach as $val) {
     //list of sections to display
@@ -645,10 +624,18 @@ function achievements_split($res,$ach) {
     if(in_array($val['name'],$counter['id'])) {
       $counter['split'][$val['section']][] = $val['name'];
     }
+    //counters
+    if($val['section'] == 'expert') {
+      ++$n;
+    }
+    if($val['section'] == 'mechanic') {
+      ++$m;
+    }
   }
   //how many ach. in one section
-  $num = count($counter['split']['expert']);
-  if(count($counter['split']['mechanic']) > $num) { $num = count($counter['split']['mechanic']); }
+  $num = $n;
+  if($m > $num) { $num = $m; }
+  if($num == 0) { $num = 8; }
 
   //chunk ach. to sections
   foreach($counter['count'] as $id => $n) {
@@ -662,10 +649,16 @@ function achievements_split($res,$ach) {
   return $ret;
 }
 
-function achievements_ajax_player($ach) {
+function achievements_ajax_player($ach,$filter = array()) {
   $ret = array('sections' => array(), 'split' => array());
 
   foreach($ach as $val) {
+    if(!empty($filter) and !isset($filter[$val['name']])) {
+      continue;
+    }
+    if(in_array($val['name'], array('marksOnGun','markOfMastery'))) {
+      continue;
+    }
     if(!isset($ret[$val['section']])) {
       $ret['sections'][$val['section']] = $val['section_i18n'];
     }
